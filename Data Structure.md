@@ -50,6 +50,19 @@ void DeleteElem(Sqlist &L, int i) {
     }
     L.length--;
 }
+//删除k个
+void DeleteKElem(Sqlist &L,int i,int k){
+    if(i<1||k<0||i+k>a.length+1){
+        return;
+    }
+    else{
+        if(k==0) return;
+        for(j=i+k;j<=a.length;j++){
+            a.elem[j-k] = a.elem[j];
+        }
+        a.length -= k;
+    }
+}
 //主函数
 int main() {
     Sqlist L;
@@ -268,6 +281,17 @@ void createList_R(Node* &L, int n) {
     }
 }
 
+//遍历
+void printlist(Node* L)
+{
+     Node *p = L;
+     while (p) {
+           printf("%d ", p->data);
+           p = p->next;
+     }
+     printf("\n");
+}
+
 //主函数
 int main() {
     Node* L;
@@ -379,5 +403,221 @@ def main():
 
 if __name__ == "__main__":
     main()
+```
+
+### 双链表
+
+#### c++
+
+```c++
+#include <iostream>
+using namespace std;
+
+typedef int Elemtype;
+
+// 定义双链表节点
+typedef struct DulNode {
+    Elemtype data;
+    struct DulNode* prior;
+    struct DulNode* next;
+} DulNode;
+
+// 初始化双链表
+DulNode* initList() {
+    DulNode* head = new DulNode();
+    head->prior = nullptr;
+    head->next = nullptr;
+    return head;
+}
+
+// 创建双链表
+DulNode* createList(int n) {
+    DulNode* head = initList();
+    DulNode* p = head;
+    for (int i = 0; i < n; i++) {
+        DulNode* newNode = new DulNode();
+        cin >> newNode->data;
+        newNode->prior = p;
+        newNode->next = nullptr;
+        p->next = newNode;
+        p = newNode;
+    }
+    return head;
+}
+// 插入操作
+void insertNode(DulNode* head, int pos, Elemtype value) {
+    DulNode* p = head;
+    int i = 0;
+    while (p && i < pos) {
+        p = p->next;
+        i++;
+    }
+    if (!p || i > pos) {
+        return;
+    }
+    DulNode* newNode = new DulNode();
+    newNode->data = value;
+    newNode->next = p->next;
+    newNode->prior = p;
+    if (p->next) {
+        p->next->prior = newNode;
+    }
+    p->next = newNode;
+}
+
+// 删除操作
+void deleteNode(DulNode* head, int pos) {
+    DulNode* p = head->next;
+    int i = 0;
+    while (p && i < pos) {
+        p = p->next;
+        i++;
+    }
+    if (!p || i > pos) {
+        return;
+    }
+    if (p->prior) {
+        p->prior->next = p->next;
+    }
+    if (p->next) {
+        p->next->prior = p->prior;
+    }
+    delete p;
+}
+
+// 正向遍历
+void traverseForward(DulNode* head) {
+    DulNode* p = head->next;
+    while (p) {
+        cout << p->data << " ";
+        p = p->next;
+    }
+    cout << endl;
+}
+
+// 反向遍历
+void traverseBackward(DulNode* head) {
+    DulNode* p = head;
+    while (p->next) {
+        p = p->next;
+    }
+    while (p != head) {
+        cout << p->data << " ";
+        p = p->prior;
+    }
+    cout << endl;
+}
+
+int main() {
+    DulNode* head = createList(5);
+    cout << "正向遍历: ";
+    traverseForward(head);
+    cout << "反向遍历: ";
+    traverseBackward(head);
+
+    insertNode(head, 2, 99);
+    cout << "插入后的正向遍历: ";
+    traverseForward(head);
+
+    deleteNode(head, 3);
+    cout << "删除后的正向遍历: ";
+    traverseForward(head);
+
+    return 0;
+}
+```
+
+#### python
+
+```python
+class DulNode:
+    def __init__(self, data=None):
+        self.data = data
+        self.prior = None
+        self.next = None
+
+# 初始化双链表
+def init_list():
+    head = DulNode()
+    return head
+
+# 创建双链表
+def create_list(n):
+    head = init_list()
+    p = head
+    for i in range(n):
+        new_node = DulNode()
+        new_node.data = int(input(f"请输入第{i + 1}个元素的值: "))
+        new_node.prior = p
+        new_node.next = None
+        p.next = new_node
+        p = new_node
+    return head
+
+# 插入操作
+def insert_node(head, pos, value):
+    p = head
+    i = 0
+    while p and i < pos:
+        p = p.next
+        i += 1
+    if not p or i > pos:
+        print("插入位置无效")
+        return
+    new_node = DulNode(value)
+    new_node.next = p.next
+    new_node.prior = p
+    if p.next:
+        p.next.prior = new_node
+    p.next = new_node
+
+# 删除操作
+def delete_node(head, pos):
+    p = head.next
+    i = 0
+    while p and i < pos:
+        p = p.next
+        i += 1
+    if not p or i > pos:
+        print("删除位置无效")
+        return
+    if p.prior:
+        p.prior.next = p.next
+    if p.next:
+        p.next.prior = p.prior
+    del p
+
+# 正向遍历
+def traverse_forward(head):
+    p = head.next
+    while p:
+        print(p.data, end=" ")
+        p = p.next
+    print()
+
+# 反向遍历
+def traverse_backward(head):
+    p = head
+    while p.next:
+        p = p.next
+    while p != head:
+        print(p.data, end=" ")
+        p = p.prior
+    print()
+
+if __name__ == "__main__":
+    head = create_list(5)
+    print("正向遍历: ", end="")
+    traverse_forward(head)
+    print("反向遍历: ", end="")
+    traverse_backward(head)
+
+    insert_node(head, 2, 99)
+    print("插入后的正向遍历: ", end="")
+    traverse_forward(head)
+
+    delete_node(head, 3)
+    print("删除后的正向遍历: ", end="")
+    traverse_forward(head)
 ```
 

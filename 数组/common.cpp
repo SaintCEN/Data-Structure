@@ -43,6 +43,19 @@ void DeleteElem(Sqlist &L, int i) {
     }
     L.length--;
 }
+//删除k个
+void DeleteKElem(Sqlist &L,int i,int k){
+    if(i<1||k<0||i+k>L.length+1){
+        return;
+    }
+    else{
+        if(k==0) return;
+        for(int j=i+k;j<=L.length;j++){
+            L.elem[j-k] = L.elem[j];
+        }
+        L.length -= k;
+    }
+}
 //主函数
 int main() {
     Sqlist L;
