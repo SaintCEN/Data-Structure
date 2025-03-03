@@ -45,15 +45,15 @@ void DeleteElem(Sqlist &L, int i) {
 }
 //删除k个
 void DeleteKElem(Sqlist &L,int i,int k){
-    if(i<1||k<0||i+k>L.length+1){
+    if(i<1||k<0||i+k>a.length+1){
         return;
     }
     else{
         if(k==0) return;
-        for(int j=i+k;j<=L.length;j++){
-            L.elem[j-k] = L.elem[j];
+        for(j=i+k;j<=a.length;j++){
+            a.elem[j-k] = a.elem[j];
         }
-        L.length -= k;
+        a.length -= k;
     }
 }
 //主函数
@@ -75,20 +75,18 @@ int main() {
 
     int pos = LocateElem(L, 5);
     if (pos) {
-        cout << "Element 5 found at position: " << pos << endl;
+        cout << pos << endl;
     } else {
-        cout << "Element 5 not found" << endl;
+        cout << "not found" << endl;
     }
 
     InsertElem(L, 3, 10);
-    cout << "After insertion: ";
     for (int i = 0; i < L.length; i++) {
         cout << L.elem[i] << " ";
     }
     cout << endl;
 
     DeleteElem(L, 2);
-    cout << "After deletion: ";
     for (int i = 0; i < L.length; i++) {
         cout << L.elem[i] << " ";
     }
