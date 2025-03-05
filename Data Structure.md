@@ -600,3 +600,362 @@ if __name__ == "__main__":
 
 ### 栈
 
+#### C++
+
+```c++
+#include<bits/stdc++.h>
+using namespace std;
+
+#define maxsize 100
+typedef int ElemType;
+
+typedef struct{
+    ElemType *base;
+    ElemType *top;
+    int stacksize;
+}SqStack;
+//初始化
+void InitStack(SqStack &s){
+    s.base = new ElemType[maxsize];
+    if(!s.base) exit(OVERFLOW);
+    s.top = s.base;
+    s.stacksize = maxsize;
+}
+//是否为空
+bool IsEmpty(SqStack s){
+    return s.top == s.base;
+}
+//是否已满
+bool IsFull(SqStack s){
+    return s.top - s.base == s.stacksize;
+}
+//进栈
+void Push(SqStack &s, ElemType e){
+    if(IsFull(s)){
+        return;
+    }
+    *s.top = e;
+    s.top++;
+}
+//出栈
+void Pop(SqStack &s, ElemType &e){
+    if(IsEmpty(s)){
+        cout << "Stack is empty. Cannot pop element." << endl;
+        return;
+    }
+    s.top--;
+    e = *s.top;
+}
+// 获取栈顶元素
+ElemType GetTop(SqStack s){
+    if(IsEmpty(s)){
+        return -1; 
+    }
+    return *(s.top - 1);
+}
+// 打印栈中的所有元素
+void PrintStack(SqStack s){
+    if(IsEmpty(s)){
+        return;
+    }
+    for(ElemType *p = s.base; p != s.top; p++){
+        cout << *p << " ";
+    }
+    cout << endl;
+}
+// 销毁栈
+void DestroyStack(SqStack &s){
+    delete[] s.base;
+    s.base = s.top = nullptr;
+    s.stacksize = 0;
+}
+
+int main(){
+    SqStack s;
+    InitStack(s);
+    Push(s, 10);
+    Push(s, 20);
+    Push(s, 30);
+    ElemType topElement = GetTop(s);
+    cout << topElement << endl; 
+    ElemType poppedElement;
+    Pop(s, poppedElement);
+    cout << poppedElement << endl; 
+    PrintStack(s); 
+    DestroyStack(s);
+    return 0;
+}
+```
+
+#### python
+
+```python
+class SqStack:
+    def __init__(self):
+        self.maxsize = 100
+        self.base = [None] * self.maxsize
+        self.top = 0
+        self.stacksize = self.maxsize
+
+    def is_empty(self):
+        return self.top == 0
+
+    def is_full(self):
+        return self.top == self.stacksize
+
+    def push(self, e):
+        if self.is_full():
+            return
+        self.base[self.top] = e
+        self.top += 1
+
+    def pop(self):
+        if self.is_empty():
+            return None
+        self.top -= 1
+        return self.base[self.top]
+
+    def get_top(self):
+        if self.is_empty():
+            return -1
+        return self.base[self.top - 1]
+
+    def print_stack(self):
+        if self.is_empty():
+            return
+        for i in range(self.top):
+            print(self.base[i], end=" ")
+        print()
+
+    def destroy_stack(self):
+        self.base = [None] * self.maxsize
+        self.top = 0
+        self.stacksize = self.maxsize
+
+
+if __name__ == "__main__":
+    s = SqStack()
+    s.push(10)
+    s.push(20)
+    s.push(30)
+    top_element = s.get_top()
+    print(top_element)
+    popped_element = s.pop()
+    print(popped_element)
+    s.print_stack()
+    s.destroy_stack()
+```
+
+#### STL
+
+**成员函数**
+
+- `top()` 访问栈顶元素（如果栈为空，此处会出错）
+- `push(x)` 向栈中插入元素 x
+- `pop()` 删除栈顶元素
+- `size()` 查询容器中的元素数量
+- `empty()` 询问容器是否为空
+
+```c++
+#include<stack>
+stack<int> s1;
+s1.push(2);
+s1.push(1);
+stack<int> s2(s1);
+s1.pop();
+cout << s1.size() << " " << s2.size() << std::endl;  // 1 2
+cout << s1.top() << " " << s2.top() << std::endl;    // 2 1
+s1.pop();
+cout << s1.empty() << " " << s2.empty() << std::endl;  // 1 0
+```
+
+### 队列
+
+#### c++
+
+```c++
+#include<bits/stdc++.h>
+using namespace std;
+
+#define maxsize 100
+typedef int ElemType;
+
+typedef struct {
+    ElemType *base;
+    int front;
+    int rear;
+} SqQueue;
+
+// 初始化
+void InitQueue(SqQueue &q) {
+    q.base = new ElemType[maxsize];
+    if (!q.base) {
+        exit(OVERFLOW);
+    }
+    q.front = 0;
+    q.rear = 0;
+}
+
+// 长度
+int QueueLength(SqQueue q) {
+    return (q.rear - q.front + maxsize) % maxsize;
+}
+
+// 判断是否为空
+bool IsEmpty(SqQueue q) {
+    return q.front == q.rear;
+}
+
+// 判断是否已满
+bool IsFull(SqQueue q) {
+    return (q.rear + 1) % maxsize == q.front;
+}
+
+// 入队
+void EnQueue(SqQueue &q, ElemType e) {
+    if (IsFull(q)) {
+        return;
+    }
+    q.base[q.rear] = e;
+    q.rear = (q.rear + 1) % maxsize;
+}
+
+// 出队
+void DeQueue(SqQueue &q, ElemType &e) {
+    if (IsEmpty(q)) {
+        return;
+    }
+    e = q.base[q.front];
+    q.front = (q.front + 1) % maxsize;
+}
+
+// 获取队头元素
+ElemType GetHead(SqQueue q) {
+    if (!IsEmpty(q)) {
+        return q.base[q.front];
+    }
+    return -1; 
+}
+
+// 打印
+void PrintQueue(SqQueue q) {
+    if (IsEmpty(q)) {
+        return;
+    }
+    int i = q.front;
+    while (i != q.rear) {
+        cout << q.base[i] << " ";
+        i = (i + 1) % maxsize;
+    }
+    cout << endl;
+}
+
+// 销毁
+void DestroyQueue(SqQueue &q) {
+    delete[] q.base;
+    q.base = nullptr;
+    q.front = q.rear = 0;
+}
+
+int main() {
+    SqQueue q;
+    InitQueue(q);
+    EnQueue(q, 10);
+    EnQueue(q, 20);
+    EnQueue(q, 30);
+    ElemType headElement = GetHead(q);
+    cout << headElement << endl;
+    ElemType dequeuedElement;
+    DeQueue(q, dequeuedElement);
+    cout << dequeuedElement << endl; 
+    PrintQueue(q); 
+    DestroyQueue(q);
+    return 0;
+}
+```
+
+#### python
+
+```python
+class SqQueue:
+    def __init__(self):
+        self.maxsize = 100
+        self.base = [None] * self.maxsize
+        self.front = 0
+        self.rear = 0
+
+    def is_empty(self):
+        return self.front == self.rear
+
+    def is_full(self):
+        return (self.rear + 1) % self.maxsize == self.front
+
+    def queue_length(self):
+        return (self.rear - self.front + self.maxsize) % self.maxsize
+
+    def enqueue(self, e):
+        if self.is_full():
+            return
+        self.base[self.rear] = e
+        self.rear = (self.rear + 1) % self.maxsize
+
+    def dequeue(self):
+        if self.is_empty():
+            return None
+        e = self.base[self.front]
+        self.front = (self.front + 1) % self.maxsize
+        return e
+
+    def get_head(self):
+        if not self.is_empty():
+            return self.base[self.front]
+        return -1
+
+    def print_queue(self):
+        if self.is_empty():
+            return
+        i = self.front
+        while i != self.rear:
+            print(self.base[i], end=" ")
+            i = (i + 1) % self.maxsize
+        print()
+
+    def destroy_queue(self):
+        self.base = [None] * self.maxsize
+        self.front = self.rear = 0
+
+
+if __name__ == "__main__":
+    q = SqQueue()
+    q.enqueue(10)
+    q.enqueue(20)
+    q.enqueue(30)
+    head_element = q.get_head()
+    print(head_element)  
+    dequeued_element = q.dequeue()
+    print(dequeued_element)  
+    q.print_queue()  
+    q.destroy_queue()
+```
+
+#### STL
+
+- `front()` 访问队首元素（如果队列为空，此处会出错）
+- `push(x)` 向队列中插入元素 x
+- `pop()` 删除队首元素
+- `size()` 查询容器中的元素数量
+- `empty()` 询问容器是否为空
+
+```c++
+#include<queue>
+queue<int> q1;
+q1.push(2);
+q1.push(1);
+queue<int> q2(q1);
+q1.pop();
+cout << q1.size() << " " << q2.size() << std::endl;    // 1 2
+cout << q1.front() << " " << q2.front() << std::endl;  // 1 2
+q1.pop();
+cout << q1.empty() << " " << q2.empty() << std::endl;  // 1 0
+```
+
