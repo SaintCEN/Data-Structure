@@ -34,12 +34,12 @@ int bfs(vector<vector<int>> maze, int sx, int sy, int gx, int gy, int m, int n) 
     int dx[4] = {1, 0, -1, 0};
     int dy[4] = {0, 1, 0, -1};
     
-    vector<vector<int>> d(m, vector<int>(n, -1));  
+   vector<vector<int>> d(m, vector<int>(n, -1));  
     
     q.push(p(sx, sy));
     d[sx][sy] = 0;  
     
-    while (!q.empty()) {
+    while (!q.em pty()) {
         p current = q.front();
         q.pop();
         int x = current.first, y = current.second;

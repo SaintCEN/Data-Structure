@@ -685,6 +685,44 @@ int main(){
     DestroyStack(s);
     return 0;
 }
+
+// 链栈节点定义
+typedef struct StackNode {
+    ElemType data;
+    struct StackNode *next;
+} StackNode;
+
+// 初始化栈
+void Init(StackNode* &s) {
+    s = NULL; 
+}
+
+// 入栈操作
+void Push(StackNode* &s, ElemType e) {
+    StackNode* p = new StackNode;  
+    p->data = e;  
+    p->next = s;  
+    s = p;  
+}
+
+// 出栈操作
+void Pop(StackNode* &s, ElemType &e) {
+    if (s == NULL) {
+        return;  
+    }
+    e = s->data;  
+    StackNode* p = s; 
+    s = s->next; 
+    delete p; 
+}
+
+// 取栈顶元素
+ElemType GetTop(StackNode* s) {
+    if (s != NULL) {
+        return s->data; 
+    }
+    return -1;  
+}
 ```
 
 #### python
@@ -871,6 +909,61 @@ int main() {
     PrintQueue(q); 
     DestroyQueue(q);
     return 0;
+}
+
+// 链队列节点定义
+typedef struct QNode {
+    ElemType data;         
+    struct QNode *next;    
+} QNode;
+
+// 链队列定义
+typedef struct {
+    QNode *front;           
+    QNode *rear;           
+} Queue;
+
+// 初始化队列
+void InitQueue(Queue *Q) {
+    Q->front = Q->rear = NULL;  
+}
+
+// 入队操作
+void EnQueue(Queue *Q, ElemType e) {
+    QNode *newNode = new QNode;
+    newNode->data = e;                             
+    newNode->next = NULL;                            
+    if (Q->rear == NULL) {
+        Q->front = Q->rear = newNode;  
+    } else {
+        Q->rear->next = newNode;  
+        Q->rear = newNode;        
+    }
+}
+
+// 出队操作
+bool DeQueue(Queue *Q, ElemType *e) {
+    if (Q->front == NULL) {  
+        return false; 
+    }
+
+    QNode *temp = Q->front;  
+    *e = temp->data;        
+    Q->front = Q->front->next; 
+
+    if (Q->front == NULL) {  
+        Q->rear = NULL;      
+    }
+    delete temp;  
+    return true;  
+}
+
+// 获取队头元素
+ElemType GetFront(Queue *Q) {
+    if (Q->front == NULL) {  
+        return -1; 
+    }
+    return Q->front->data;          
 }
 ```
 
