@@ -7,35 +7,28 @@ char p[N], s[N]; // 用 p 来匹配 s
 // 即 p[0...k] == p[i-k...i]
 int ne[N]; 
 int n, m; // n 是模板串长度 m 是模式串长度
-int main()
-{
+int main(){
     cin >> n >> p >> m >> s;
     // p[0...0] 的区间内一定没有相等前后缀
     ne[0] = -1;
     // 构造模板串的 next 数组
-    for (int i = 1, j = -1; i < n; i ++)
-    {
-        while (j != -1 && p[i] != p[j + 1])
-        {
+    for (int i = 1, j = -1; i < n; i ++){
+        while (j != -1 && p[i] != p[j + 1]){
             // 若前后缀匹配不成功
             // 反复令 j 回退，直至到 -1 或是 s[i] == s[j + 1]
             j = ne[j];
         }
-        if (p[i] == p[j + 1]) 
-        {
+        if (p[i] == p[j + 1]) {
             j ++; // 匹配成功时，最长相等前后缀变长，最长相等前后缀前缀的最后一位变大
         }
         ne[i] = j; // 令 ne[i] = j，以方便计算 next[i + 1]
     }
     // kmp start !
-    for (int i = 0, j = -1; i < m; i ++)
-    {
-       while (j != -1 && s[i] != p[j + 1])
-       {
+    for (int i = 0, j = -1; i < m; i ++){
+       while (j != -1 && s[i] != p[j + 1]){
            j = ne[j];
        }
-       if (s[i] == p[j + 1])
-       {
+       if (s[i] == p[j + 1]){
            j ++; // 匹配成功时，模板串指向下一位
        }
        if (j == n - 1) // 模板串匹配完成，第一个匹配字符下标为 0，故到 n - 1
@@ -48,6 +41,5 @@ int main()
            j = ne[j]; 
        }
     }
-
    return 0;
 }

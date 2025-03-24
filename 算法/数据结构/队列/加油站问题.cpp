@@ -1,5 +1,6 @@
 #include<iostream>
 #include<queue>
+using namespace std;
 const int N = 10001
 int main(){
 	int l,p,n

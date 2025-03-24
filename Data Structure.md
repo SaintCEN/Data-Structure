@@ -965,6 +965,49 @@ ElemType GetFront(Queue *Q) {
     }
     return Q->front->data;          
 }
+
+//带头结点的循环队列
+
+typedef struct QNode {
+    int data;          
+    struct QNode* next;     
+} QNode;
+typedef struct {
+    QNode* rear;            
+} LinkQueue;
+
+bool initQueue(LinkQueue& Q) {
+            Q.rear = (QNode *)malloc(sizeof(QNode));
+             if  (Q.rear == NULL)
+                   return false;
+             Q.rear->next = Q.rear;
+             return true;
+}
+bool inQueue(LinkQueue& Q, int value) {
+    QNode* newNode = (QNode*)malloc(sizeof(QNode));
+    if (newNode == NULL) {
+        return false; 
+    }
+    newNode->data = value;
+    newNode->next = Q.rear->next; 
+    Q.rear->next = newNode;     
+    Q.rear = newNode;            
+    return true;
+}
+
+bool outQueue(LinkQueue& Q, int& value) {
+    if (Q.rear->next == Q.rear) {
+        return false; 
+    }
+    QNode* frontNode = Q.rear->next->next; 
+    value = frontNode->data;               
+    Q.rear->next->next = frontNode->next;  
+    if (frontNode == Q.rear) {            
+        Q.rear = Q.rear->next;          
+    }
+    free(frontNode);                  
+    return true;
+}
 ```
 
 #### python
@@ -1051,4 +1094,149 @@ cout << q1.front() << " " << q2.front() << endl;  // 1 2
 q1.pop();
 cout << q1.empty() << " " << q2.empty() << endl;  // 1 0
 ```
+
+### 串
+
+#### C++
+
+```c++
+#include<iostream>
+using namespace std;
+
+#define maxlen 255
+#define chunksize 80
+//顺序存储
+typedef struct{
+    char ch[maxlen+1];
+    int length;
+}SString;
+//链式存储
+typedef struct chunk{
+    char ch[chunksize];
+    struct chunk *next;
+}chunk;
+typedef struct{
+    chunk *head,*tail;
+    int length;
+}LString；
+ 
+//字串定位
+//Brute-Force
+int BF(SString s,SSting t,int pos){
+    int i = pos;
+    int j = 1;
+    while(i<=s.length && j<=t.length()){
+        if(s.ch[i]==t.ch[j]){
+            i++;
+            j++;
+        }
+            else{
+                i = i-j+2;//指针回退
+                j = 1;
+        }
+    }
+   if(j>t.length) return i-t.length //匹配成功
+   else return 0;//匹配失败
+}
+//KMP
+void get_next(SString t, int next[]) {
+    int i = 1, j = 0;
+    next[1] = 0;
+    while (i < t.length) {
+        if (j == 0 || t.ch[i] == t.ch[j]) {
+            i++;
+            j++;
+            next[i] = j;
+        } else {
+            j = next[j];
+        }
+    }
+}
+
+int KMP(SString s, SString t, int pos) {
+    int i = pos;
+    int j = 1;
+    int* next = new int[t.length + 1];
+    get_next(t, next);
+    while (i <= s.length && j <= t.length) {
+        if (j == 0 || s.ch[i] == t.ch[j]) {
+            i++;
+            j++;
+        } else {
+            j = next[j];
+        }
+    }
+    delete[] next;
+    return j > t.length ? i - t.length : 0;
+}
+```
+
+#### python
+
+```python
+class SString:
+    def __init__(self):
+        self.ch = [''] * 256
+        self.length = 0
+
+class LString:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+        self.length = 0
+
+class Chunk:
+    def __init__(self):
+        self.ch = [''] * 80
+        self.next = None
+
+def BF(s, t, pos):
+    i = pos
+    j = 0
+    while i < s.length and j < t.length:
+        if s.ch[i] == t.ch[j]:
+            i += 1
+            j += 1
+        else:
+            i = i - j + 1
+            j = 0
+    if j == t.length:
+        return i - t.length
+    else:
+        return 0
+
+def get_next(t, next):
+    i = 0
+    j = -1
+    next[0] = -1
+    while i < t.length - 1:
+        if j == -1 or t.ch[i] == t.ch[j]:
+            i += 1
+            j += 1
+            next[i] = j
+        else:
+            j = next[j]
+
+def KMP(s, t, pos):
+    i = pos
+    j = 0
+    next = [0] * t.length
+    get_next(t, next)
+    while i < s.length and j < t.length:
+        if j == -1 or s.ch[i] == t.ch[j]:
+            i += 1
+            j += 1
+        else:
+            j = next[j]
+    if j == t.length:
+        return i - t.length
+    else:
+        return 0
+```
+
+### 数组
+
+$$
+LOC(i,j)=LOC(0,0)+(n*i+j)*L
+$$
 
