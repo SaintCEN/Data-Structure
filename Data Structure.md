@@ -1118,7 +1118,7 @@ typedef struct chunk{
 typedef struct{
     chunk *head,*tail;
     int length;
-}LString；
+}LString;
  
 //字串定位
 //Brute-Force
@@ -1139,45 +1139,82 @@ int BF(SString s,SSting t,int pos){
    else return 0;//匹配失败
 }
 //KMP
-void get_next(SString t, int next[]) {
-    int i = 1, j = 0;
-    next[1] = 0;
-    while (i < t.length) {
-        if (j == 0 || t.ch[i] == t.ch[j]) {
-            i++;
-            j++;
-            next[i] = j;
-        } else {
-            j = next[j];
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+vector<int> Next(const string &j) {
+    int m = j.length();
+    vector<int> next(m + 1, 0);
+    int k = 0;
+    next[0] = -1;
+    for (int i = 1; i < m; i++) {
+        while (k >= 0 && j[i] != j[k]) {
+            k = next[k];
         }
+        k++;
+        next[i + 1] = k;
     }
+    return next;
 }
+void KMP(const string &t, const string &j) {
+    int n = t.length();
+    int m = j.length();
+    if (m == 0) {
+        cout << "Not Found" << endl;
+        return;
+    }
+    vector<int> next = Next(j);
+    int i = 0;
+    int k = 0;
 
-int KMP(SString s, SString t, int pos) {
-    int i = pos;
-    int j = 1;
-    int* next = new int[t.length + 1];
-    get_next(t, next);
-    while (i <= s.length && j <= t.length) {
-        if (j == 0 || s.ch[i] == t.ch[j]) {
+    while (i < n) {
+        if (k == -1 || t[i] == j[k]) {
             i++;
-            j++;
+            k++;
+            if (k == m) {
+                cout << t.substr(i - m) << endl;
+                return;
+            }
         } else {
-            j = next[j];
+            k = next[k];
         }
     }
-    delete[] next;
-    return j > t.length ? i - t.length : 0;
+    cout << "Not Found" << endl;
+}
+int main() {
+    string t;
+    int n;
+    getline(cin, t);
+    cin >> n;
+    cin.ignore();
+    while (n--) {
+        string j;
+        getline(cin, j);
+        KMP(t, j);
+    }
+    return 0;
 }
 ```
 
 #### python
 
 ```python
+import sys
+from typing import List
+
+maxlen = 255
+chunksize = 80
+
 class SString:
     def __init__(self):
-        self.ch = [''] * 256
+        self.ch = [''] * (maxlen + 1)
         self.length = 0
+
+class Chunk:
+    def __init__(self):
+        self.ch = [''] * chunksize
+        self.next = None
 
 class LString:
     def __init__(self):
@@ -1185,58 +1222,110 @@ class LString:
         self.tail = None
         self.length = 0
 
-class Chunk:
-    def __init__(self):
-        self.ch = [''] * 80
-        self.next = None
-
-def BF(s, t, pos):
+def BF(s: SString, t: SString, pos: int) -> int:
     i = pos
-    j = 0
-    while i < s.length and j < t.length:
+    j = 1
+    while i <= s.length and j <= t.length:
         if s.ch[i] == t.ch[j]:
             i += 1
             j += 1
         else:
-            i = i - j + 1
-            j = 0
-    if j == t.length:
+            i = i - j + 2
+            j = 1
+    if j > t.length:
         return i - t.length
     else:
         return 0
 
-def get_next(t, next):
+def compute_next(pattern: str) -> List[int]:
+    m = len(pattern)
+    next_arr = [0] * (m + 1)
+    k = 0
+    next_arr[0] = -1
+    for i in range(1, m):
+        while k >= 0 and pattern[i] != pattern[k]:
+            k = next_arr[k]
+        k += 1
+        next_arr[i + 1] = k
+    return next_arr
+
+def KMP(text: str, pattern: str) -> None:
+    n = len(text)
+    m = len(pattern)
+    if m == 0:
+        print("Not Found")
+        return
+    next_arr = compute_next(pattern)
     i = 0
-    j = -1
-    next[0] = -1
-    while i < t.length - 1:
-        if j == -1 or t.ch[i] == t.ch[j]:
+    k = 0
+    while i < n:
+        if k == -1 or text[i] == pattern[k]:
             i += 1
-            j += 1
-            next[i] = j
+            k += 1
+            if k == m:
+                print(text[i - m:])
+                return
         else:
-            j = next[j]
+            k = next_arr[k]
+    print("Not Found")
 
-def KMP(s, t, pos):
-    i = pos
-    j = 0
-    next = [0] * t.length
-    get_next(t, next)
-    while i < s.length and j < t.length:
-        if j == -1 or s.ch[i] == t.ch[j]:
-            i += 1
-            j += 1
-        else:
-            j = next[j]
-    if j == t.length:
-        return i - t.length
-    else:
-        return 0
+def main():
+    t = sys.stdin.readline().strip()
+    n = int(sys.stdin.readline())
+    for _ in range(n):
+        j = sys.stdin.readline().strip()
+        KMP(t, j)
+
+if __name__ == "__main__":
+    main()
 ```
+
+#### STL
+
+长度：``s.size()``/``s.length()``
+
+查找字符（串）第一次出现的位置：``s.find(u)``/``s.find(t,pos)``
+
+截取子串：``substr(pos,len)``
+
+插入：``insert(index,str)``
+
+替换字符串：``replace(first,second,str)``
 
 ### 数组
 
 $$
-LOC(i,j)=LOC(0,0)+(n*i+j)*L
+LOC(i,j)=LOC(0,0)+(n*i+j)*L\\
+其中L为一个内存存储单元
 $$
+
+#### 特殊矩阵的压缩存储
+
+$$
+对称矩阵：a_{ij} = a_{ji}，若一维数组压缩：\\i>=j,k = \frac{i(i-1)}{2}+j-1\\i<j,k = \frac{j(j-1)}{2}+i-1\\
+三角矩阵：\\
+上三角：i>j,k = \frac{n(n+1)}{2},i<=j,\frac{i(i-1)}{2}+j-1\\
+下三角：i>j,k = \frac{i(i-1)}{2}+j-1,i<=j,\frac{n(n+1)}{2}\\
+多对角线矩阵：根据非零元的分布确定通项公式
+$$
+
+### 广义表
+
+```c++
+typedef enum(ATOM,LIST) ElemTag;//ATOM==0,原子；LIST==1，子表
+typedef struct GLNode
+{
+    ElemTag tag;//区分原子结点or表结点
+    union{
+        AtomType atom;//原子值域
+        struct{
+            struct GNode* hp,*tp;
+        }ptr;
+    };
+}*GList;
+GetHead(LS);//取表头
+GetTail(LS);//取表尾，仍为广义表
+```
+
+### 树和二叉树
 
