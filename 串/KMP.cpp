@@ -3,13 +3,16 @@
 #include <vector>
 using namespace std;
 
-vector<int> Next(const string &j) {
+vector<int> Next(const string &j)
+{
     int m = j.length();
     vector<int> next(m + 1, 0);
     int k = 0;
     next[0] = -1;
-    for (int i = 1; i < m; i++) {
-        while (k >= 0 && j[i] != j[k]) {
+    for (int i = 1; i < m; i++)
+    {
+        while (k >= 0 && j[i] != j[k])
+        {
             k = next[k];
         }
         k++;
@@ -18,10 +21,12 @@ vector<int> Next(const string &j) {
     return next;
 }
 
-void KMP(const string &t, const string &j) {
+void KMP(const string &t, const string &j)
+{
     int n = t.length();
     int m = j.length();
-    if (m == 0) {
+    if (m == 0)
+    {
         cout << "Not Found" << endl;
         return;
     }
@@ -29,28 +34,35 @@ void KMP(const string &t, const string &j) {
     int i = 0;
     int k = 0;
 
-    while (i < n) {
-        if (k == -1 || t[i] == j[k]) {
+    while (i < n)
+    {
+        if (k == -1 || t[i] == j[k])
+        {
             i++;
             k++;
-            if (k == m) {
+            if (k == m)
+            {
                 cout << t.substr(i - m) << endl;
                 return;
             }
-        } else {
+        }
+        else
+        {
             k = next[k];
         }
     }
     cout << "Not Found" << endl;
 }
 
-int main() {
+int main()
+{
     string t;
     int n;
     getline(cin, t);
     cin >> n;
     cin.ignore();
-    while (n--) {
+    while (n--)
+    {
         string j;
         getline(cin, j);
         KMP(t, j);
@@ -84,6 +96,4 @@ j[4] != j[k]，回退到 next[k] = next[0] = -1
 k++，k = 0
 next[4] = 0
 最终 next 数组为：[-1, 0, 0, 1, 2, 0]。
-
-
 */

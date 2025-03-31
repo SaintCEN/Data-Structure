@@ -1284,7 +1284,7 @@ if __name__ == "__main__":
 
 长度：``s.size()``/``s.length()``
 
-查找字符（串）第一次出现的位置：``s.find(u)``/``s.find(t,pos)``
+查找字符（串）第一次出现的位置：``s.find(u)``/``s.find(t,pos)``     **注：不是KMP**
 
 截取子串：``substr(pos,len)``
 
@@ -1327,5 +1327,299 @@ GetHead(LS);//取表头
 GetTail(LS);//取表尾，仍为广义表
 ```
 
-### 树和二叉树
+### 树
+
+#### 基本概念
+
+1. **结点**
+
+   - 树中的基本单元，包含数据项及指向其他结点的分支。    
+
+     ```
+         A
+        / \
+       B   C
+     ```
+
+2. **结点的度**
+
+   - 一个结点的子树（子结点）数量。  
+
+3. **树的度**
+
+   - 树中所有结点的度的最大值。  
+
+4. **叶子结点**
+
+   - 度为0的结点（无子结点），也称终端结点。  
+
+5. **非终端结点**
+
+   - 度不为0的结点（至少有一个子结点），也称内部结点。  
+
+6. **双亲和孩子**
+
+   - **双亲**：某结点的直接上级结点。  
+   - **孩子**：某结点的直接下级结点。  
+
+7. **兄弟**
+
+   - 同一双亲下的子结点互为兄弟。  
+
+8. **祖先和子孙**
+
+   - **祖先**：从根到该结点路径上的所有结点（不含自身）。  
+   - **子孙**：以某结点为根的子树中所有结点（不含自身）。  
+   - **示例**：A是D的祖先；D、E是B的子孙。  
+     
+     ```
+         A
+        / \
+       B   C
+      / \
+     D   E
+     ```
+
+9. **层次（Level）**
+
+   - 根结点为第1层，其子结点为第2层，依此类推。  
+
+10. **堂兄弟**
+
+- 双亲不同但处于同一层次的结点。  
+- **示例**：D和F是堂兄弟（若C有子结点F）。
+
+           A
+         /   \
+        B     C
+       / \   /
+      D   E F
+
+11. **树的深度/高度**
+
+    **深度**：从根到某结点的最长路径长度（根深度为0或1，定义可能不同）。  
+
+    **高度**：从某结点到最远叶子的最长路径（树的高度为根的高度）。 
+
+12. **有序树与无序树**
+
+    **有序树**：结点的子树有明确顺序（如左/右孩子不可交换）。  
+
+    **无序树**：子树顺序无关紧要。  
+
+13. **森林（Forest）**
+
+- 由多棵互不相交的树组成的集合。删除树的根结点后，其子树构成森林。 
+
+#### 二叉树
+
+* 每个节点至多只有两个子树
+* 满二叉树：每个节点均有两个子树
+* 完全二叉树：叶子节点只在最深的两层出现
+
+```c++
+#include <iostream>
+#include <stack>
+using namespace std;
+#define MAXSIZE 100
+typedef char TElemType;
+
+// 顺序存储结构
+typedef TElemType SqBiTree[MAXSIZE];
+SqBiTree bt;
+// 链式存储结构
+typedef struct BiTNode
+{
+    TElemType data;
+    struct BiTNode *lchild, *rchild; 
+} BiTNode, *BiTree;
+
+// 中序遍历递归算法
+void InOrderTraverse(BiTree T)
+{
+    if (T)
+    {
+        InOrderTraverse(T->lchild);
+        cout << T->data;
+        InOrderTraverse(T->rchild);
+    }
+}
+
+// 先序遍历递归算法
+void PreOrderTraverse(BiTree T)
+{
+    if (T)
+    {
+        cout << T->data;
+        PreOrderTraverse(T->lchild);
+        PreOrderTraverse(T->rchild);
+    }
+}
+// 后序遍历递归算法
+void PostOrderTraverse(BiTree T)
+{ 
+    if (T)
+    {
+        PostOrderTraverse(T->lchild);
+        PostOrderTraverse(T->rchild);
+        cout << T->data;
+    }
+}
+// 中序遍历非递归算法
+void InOrderTraverse_NonRecursive(BiTree T)
+{
+    stack<BiTree> s; 
+    BiTree p = T;
+    while (p || !s.empty())
+    {
+        if (p)
+        {
+            s.push(p);
+            p = p->lchild;
+        }
+        else
+        {
+            BiTree q = s.top();
+            s.pop();
+            cout << q->data;
+            p = q->rchild;
+        }
+    }
+}
+
+// 创建二叉树（前序）
+void CreateBiTree(BiTree &T)
+{
+    char ch;
+    cin >> ch;
+    if (ch == '#')
+    {
+        T = nullptr;
+    }
+    else
+    {
+        T = new BiTNode;
+        T->data = ch;
+        CreateBiTree(T->lchild);
+        CreateBiTree(T->rchild);
+    }
+}
+
+// 复制二叉树
+void CopyBiTree(BiTree T, BiTree &NewT)
+{ // 修正参数语法
+    if (!T)
+    {
+        NewT = nullptr;
+        return;
+    }
+    NewT = new BiTNode;
+    NewT->data = T->data;
+    CopyBiTree(T->lchild, NewT->lchild);
+    CopyBiTree(T->rchild, NewT->rchild);
+}
+
+// 求二叉树高度
+int Depth(BiTree T)
+{
+    if (!T)
+        return 0;
+    int m = Depth(T->lchild);
+    int n = Depth(T->rchild);
+    if(m > n){
+        return (m + 1);
+    }
+    else{
+        return (n + 1);
+    }
+}
+
+// 统计二叉树节点个数
+int NodeCount(BiTree T)
+{
+    if (!T)
+        return 0;
+    return NodeCount(T->lchild) + NodeCount(T->rchild) + 1; 
+}
+```
+
+#### python
+
+```python
+class BiTNode:
+    def __init__(self, data=None):
+        self.data = data
+        self.lchild = None
+        self.rchild = None
+
+# 递归中序遍历
+def in_order_traverse(root):
+    if root:
+        in_order_traverse(root.lchild)
+        print(root.data, end='')
+        in_order_traverse(root.rchild)
+
+# 递归先序遍历
+def pre_order_traverse(root):
+    if root:
+        print(root.data, end='')
+        pre_order_traverse(root.lchild)
+        pre_order_traverse(root.rchild)
+
+# 递归后序遍历
+def post_order_traverse(root):
+    if root:
+        post_order_traverse(root.lchild)
+        post_order_traverse(root.rchild)
+        print(root.data, end='')
+
+# 非递归中序遍历
+def in_order_non_recursive(root):
+    stack = []
+    p = root
+    while p or stack:
+        if p:
+            stack.append(p)
+            p = p.lchild
+        else:
+            node = stack.pop()
+            print(node.data, end='')
+            p = node.rchild
+
+# 创建二叉树（前序输入）
+def create_bi_tree(s):
+    def helper(it):
+        try:
+            ch = next(it)
+            if ch == '#':
+                return None
+            node = BiTNode(ch)
+            node.lchild = helper(it)
+            node.rchild = helper(it)
+            return node
+        except StopIteration:
+            return None
+    return helper(iter(s))
+
+# 复制二叉树
+def copy_bi_tree(root):
+    if not root:
+        return None
+    new_node = BiTNode(root.data)
+    new_node.lchild = copy_bi_tree(root.lchild)
+    new_node.rchild = copy_bi_tree(root.rchild)
+    return new_node
+
+# 计算二叉树深度
+def depth(root):
+    if not root:
+        return 0
+    return max(depth(root.lchild), depth(root.rchild)) + 1
+
+# 统计节点个数
+def node_count(root):
+    if not root:
+        return 0
+    return node_count(root.lchild) + node_count(root.rchild) + 1
+```
 
