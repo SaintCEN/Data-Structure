@@ -123,3 +123,61 @@ int NodeCount(BiTree T)
         return 0;
     return NodeCount(T->lchild) + NodeCount(T->rchild) + 1;
 }
+
+// 线索二叉树存储结构
+typedef struct BiThrNode
+{
+    TElemType data;
+    struct BiThrNode *lchild, *rchild; // 左右孩子指针
+    int LTag, RTag;                    // 左右标签，0表示孩子，1表示前驱/后继
+} BiThrNode, *BiThrTree;
+
+// 构造中序线索二叉树
+void InThreading(BiThrTree p)
+{
+    BiThrNode *pre;
+    if (p)
+    {
+        InThreading(p->lchild);
+        if (!p->lchild)
+        {
+            p->LTag = 1;
+            p->lchild = pre;
+        }
+        else
+        {
+            p->LTag = 0;
+        }
+        if (!pre->rchild)
+        {
+            pre->RTag = 1;
+            pre->rchild = p;
+        }
+        else
+        {
+            pre->RTag = 0;
+            pre = p;
+        }
+        InThreading(p->rchild);
+    }
+}
+
+// 遍历中序线索二叉树
+void InOrderTraverse_Thr(BiThrTree T)
+{
+    BiThrTree p = T->lchild; // 带头结点
+    while (p != T)
+    {
+        while (p->LTag == 0)
+        {
+            p = p->lchild;
+        }
+        cout << p->data;
+        while (p->RTag == 1 && p->rchild != T)
+        {
+            p = p->rchild;
+            cout << p->data;
+        }
+        p = p->rchild;
+    }
+}
