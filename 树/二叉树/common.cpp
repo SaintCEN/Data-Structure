@@ -133,9 +133,9 @@ typedef struct BiThrNode
 } BiThrNode, *BiThrTree;
 
 // 构造中序线索二叉树
+BiThrNode *pre = NULL;
 void InThreading(BiThrTree p)
 {
-    BiThrNode *pre;
     if (p)
     {
         InThreading(p->lchild);
@@ -156,8 +156,8 @@ void InThreading(BiThrTree p)
         else
         {
             pre->RTag = 0;
-            pre = p;
         }
+        pre = p;
         InThreading(p->rchild);
     }
 }
