@@ -87,7 +87,7 @@ void CreateBiTree(BiTree &T)
 
 // 复制二叉树
 void CopyBiTree(BiTree T, BiTree &NewT)
-{ // 修正参数语法
+{
     if (!T)
     {
         NewT = nullptr;
@@ -106,14 +106,7 @@ int Depth(BiTree T)
         return 0;
     int m = Depth(T->lchild);
     int n = Depth(T->rchild);
-    if (m > n)
-    {
-        return (m + 1);
-    }
-    else
-    {
-        return (n + 1);
-    }
+    return (m > n) ? (m + 1) : (n + 1);
 }
 
 // 统计二叉树节点个数
@@ -128,8 +121,8 @@ int NodeCount(BiTree T)
 typedef struct BiThrNode
 {
     TElemType data;
-    struct BiThrNode *lchild, *rchild; // 左右孩子指针
-    int LTag, RTag;                    // 左右标签，0表示孩子，1表示前驱/后继
+    struct BiThrNode *lchild, *rchild;
+    int LTag, RTag;
 } BiThrNode, *BiThrTree;
 
 // 构造中序线索二叉树
@@ -148,7 +141,7 @@ void InThreading(BiThrTree p)
         {
             p->LTag = 0;
         }
-        if (!pre->rchild)
+        if (pre && !pre->rchild)
         {
             pre->RTag = 1;
             pre->rchild = p;
@@ -165,7 +158,7 @@ void InThreading(BiThrTree p)
 // 遍历中序线索二叉树
 void InOrderTraverse_Thr(BiThrTree T)
 {
-    BiThrTree p = T->lchild; // 带头结点
+    BiThrTree p = T->lchild;
     while (p != T)
     {
         while (p->LTag == 0)
