@@ -35,6 +35,7 @@ void PreOrderTraverse(BiTree T)
         PreOrderTraverse(T->rchild);
     }
 }
+
 // 后序遍历递归算法
 void PostOrderTraverse(BiTree T)
 {
@@ -45,6 +46,7 @@ void PostOrderTraverse(BiTree T)
         cout << T->data;
     }
 }
+
 // 中序遍历非递归算法
 void InOrderTraverse_NonRecursive(BiTree T)
 {

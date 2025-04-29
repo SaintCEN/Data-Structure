@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <list>
+
 using namespace std;
 
 // 双亲表示法的节点结构

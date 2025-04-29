@@ -110,9 +110,3 @@ void CreateAL(ALGraph &G)
         */
     }
 }
-
-int main()
-{
-
-    return 0;
-}
