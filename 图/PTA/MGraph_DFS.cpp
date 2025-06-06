@@ -31,9 +31,7 @@ int main()
 
     G = CreateGraph();
     scanf("%d", &V);
-    printf("DFS from %d:", V);
     DFS(G, V, Visit);
-
     return 0;
 }
 

@@ -3,18 +3,23 @@
 
 #define ERROR -1
 typedef int ElementType;
-typedef enum { push, pop, end } Operation;
-typedef enum { false, true } bool;
+typedef enum
+{
+    push,
+    pop,
+    end
+} Operation;
 typedef int Position;
 typedef struct SNode *PtrToSNode;
-struct SNode {
-    ElementType *Data;  /* 存储元素的数组 */
-    Position Top;       /* 栈顶指针       */
-    int MaxSize;        /* 堆栈最大容量   */
+struct SNode
+{
+    ElementType *Data; /* 存储元素的数组 */
+    Position Top;      /* 栈顶指针       */
+    int MaxSize;       /* 堆栈最大容量   */
 };
 typedef PtrToSNode Stack;
 
-Stack CreateStack( int MaxSize )
+Stack CreateStack(int MaxSize)
 {
     Stack S = (Stack)malloc(sizeof(struct SNode));
     S->Data = (ElementType *)malloc(MaxSize * sizeof(ElementType));
@@ -23,11 +28,11 @@ Stack CreateStack( int MaxSize )
     return S;
 }
 
-bool Push( Stack S, ElementType X );
-ElementType Pop( Stack S );
+bool Push(Stack S, ElementType X);
+ElementType Pop(Stack S);
 
-Operation GetOp();          /* 裁判实现，细节不表 */
-void PrintStack( Stack S ); /* 裁判实现，细节不表 */
+Operation GetOp();        /* 裁判实现，细节不表 */
+void PrintStack(Stack S); /* 裁判实现，细节不表 */
 
 int main()
 {
@@ -37,15 +42,18 @@ int main()
 
     scanf("%d", &N);
     S = CreateStack(N);
-    while ( !done ) {
-        switch( GetOp() ) {
-        case push: 
+    while (!done)
+    {
+        switch (GetOp())
+        {
+        case push:
             scanf("%d", &X);
             Push(S, X);
             break;
         case pop:
             X = Pop(S);
-            if ( X!=ERROR ) printf("%d is out\n", X);
+            if (X != ERROR)
+                printf("%d is out\n", X);
             break;
         case end:
             PrintStack(S);
@@ -55,23 +63,31 @@ int main()
     }
     return 0;
 }
-bool Push( Stack S, ElementType X ) {
-    if (S->Top == S->MaxSize) {
+bool Push(Stack S, ElementType X)
+{
+    if (S->Top == S->MaxSize)
+    {
         printf("Stack Full\n");
-        return false; 
-    } else {
+        return false;
+    }
+    else
+    {
         S->Data[S->Top] = X;
         S->Top++;
-        return true; 
+        return true;
     }
 }
 
-ElementType Pop( Stack S ) {
-    if (S->Top == 0) {
+ElementType Pop(Stack S)
+{
+    if (S->Top == 0)
+    {
         printf("Stack Empty\n");
-        return ERROR; 
-    } else {
+        return ERROR;
+    }
+    else
+    {
         S->Top--;
-        return S->Data[S->Top]; 
+        return S->Data[S->Top];
     }
 }

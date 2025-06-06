@@ -1,20 +1,27 @@
 #include <iostream>
 #include <stack>
-using namespace std;
-#define MAXSIZE 100
-typedef char TElemType;
+#include <queue>
 
-// 顺序存储结构
-typedef TElemType SqBiTree[MAXSIZE];
-SqBiTree bt;
-// 链式存储结构
+using namespace std;
+
+#define MAXSIZE 100
+
+typedef int TElemType;
+
+// 顺序存储结构（即层序遍历，空结点值可以为0）
+typedef struct
+{
+    TElemType data[MAXSIZE];
+} SqBiTree;
+
+// 链式定义结点结构
 typedef struct BiTNode
 {
     TElemType data;
-    struct BiTNode *lchild, *rchild;
+    BiTNode *lchild, *rchild;
 } BiTNode, *BiTree;
 
-// 中序遍历递归算法
+// 中序遍历（递归）
 void InOrderTraverse(BiTree T)
 {
     if (T)
@@ -25,7 +32,7 @@ void InOrderTraverse(BiTree T)
     }
 }
 
-// 先序遍历递归算法
+// 先序遍历（递归）
 void PreOrderTraverse(BiTree T)
 {
     if (T)
@@ -36,7 +43,7 @@ void PreOrderTraverse(BiTree T)
     }
 }
 
-// 后序遍历递归算法
+// 后序遍历（递归）
 void PostOrderTraverse(BiTree T)
 {
     if (T)
@@ -47,7 +54,7 @@ void PostOrderTraverse(BiTree T)
     }
 }
 
-// 中序遍历非递归算法
+// 中序遍历（非递归）
 void InOrderTraverse_NonRecursive(BiTree T)
 {
     stack<BiTree> s;
@@ -69,7 +76,75 @@ void InOrderTraverse_NonRecursive(BiTree T)
     }
 }
 
-// 创建二叉树（前序）
+// 先序遍历（非递归）
+void PreOrderTraverse_NonRecursive(BiTree T)
+{
+    if (!T)
+        return;
+    stack<BiTree> s;
+    s.push(T);
+    while (!s.empty())
+    {
+        BiTree q = s.top();
+        s.pop();
+        cout << q->data;
+        if (q->rchild)
+            s.push(q->rchild);
+        if (q->lchild)
+            s.push(q->lchild);
+    }
+}
+
+// 后序遍历（非递归）
+void PostOrderTraverse_NonRecursive(BiTree T)
+{
+    stack<BiTree> s;
+    BiTree p = T;
+    BiTree lastVisited = nullptr;
+    while (p || !s.empty())
+    {
+        if (p)
+        {
+            s.push(p);
+            p = p->lchild;
+        }
+        else
+        {
+            BiTree q = s.top();
+            if (q->rchild && lastVisited != q->rchild)
+            {
+                p = q->rchild;
+            }
+            else
+            {
+                cout << q->data;
+                lastVisited = q;
+                s.pop();
+            }
+        }
+    }
+}
+
+// 层次遍历二叉树
+void LevelOrderTraverse(BiTree T)
+{
+    if (!T)
+        return;
+    queue<BiTree> q;
+    q.push(T);
+    while (!q.empty())
+    {
+        BiTree node = q.front();
+        q.pop();
+        cout << node->data << ' ';
+        if (node->lchild)
+            q.push(node->lchild);
+        if (node->rchild)
+            q.push(node->rchild);
+    }
+}
+
+// 根据前序输入创建二叉树，'#'表示空节点
 void CreateBiTree(BiTree &T)
 {
     char ch;
@@ -87,92 +162,127 @@ void CreateBiTree(BiTree &T)
     }
 }
 
-// 复制二叉树
-void CopyBiTree(BiTree T, BiTree &NewT)
+// 根据中序输入创建二叉树，'#'表示空节点
+void CreateBiTree(BiTree &T)
 {
-    if (!T)
+    char ch;
+    cin >> ch;
+    if (ch == '#')
     {
-        NewT = nullptr;
-        return;
+        T = nullptr;
     }
-    NewT = new BiTNode;
-    NewT->data = T->data;
-    CopyBiTree(T->lchild, NewT->lchild);
-    CopyBiTree(T->rchild, NewT->rchild);
-}
-
-// 求二叉树高度
-int Depth(BiTree T)
-{
-    if (!T)
-        return 0;
-    int m = Depth(T->lchild);
-    int n = Depth(T->rchild);
-    return (m > n) ? (m + 1) : (n + 1);
-}
-
-// 统计二叉树节点个数
-int NodeCount(BiTree T)
-{
-    if (!T)
-        return 0;
-    return NodeCount(T->lchild) + NodeCount(T->rchild) + 1;
-}
-
-// 线索二叉树存储结构
-typedef struct BiThrNode
-{
-    TElemType data;
-    struct BiThrNode *lchild, *rchild;
-    int LTag, RTag;
-} BiThrNode, *BiThrTree;
-
-// 构造中序线索二叉树
-BiThrNode *pre = NULL;
-void InThreading(BiThrTree p)
-{
-    if (p)
+    else
     {
-        InThreading(p->lchild);
-        if (!p->lchild)
+        CreateBiTree(T->lchild);
+        T = new BiTNode;
+        T->data = ch;
+        CreateBiTree(T->rchild);
+    }
+
+    // 根据后序输入创建二叉树，'#'表示空节点
+    void CreateBiTree(BiTree & T)
+    {
+        char ch;
+        cin >> ch;
+        if (ch == '#')
         {
-            p->LTag = 1;
-            p->lchild = pre;
+            T = nullptr;
         }
         else
         {
-            p->LTag = 0;
+            CreateBiTree(T->lchild);
+            CreateBiTree(T->rchild);
+            T = new BiTNode;
+            T->data = ch;
         }
-        if (pre && !pre->rchild)
+
+        // 计算二叉树的高度
+        int Depth(BiTree T)
         {
+            if (!T)
+                return 0;
+            int m = Depth(T->lchild);
+            int n = Depth(T->rchild);
+            return (m > n ? m + 1 : n + 1);
+        }
+
+        // 统计二叉树的节点个数
+        int NodeCount(BiTree T)
+        {
+            if (!T)
+                return 0;
+            return NodeCount(T->lchild) + NodeCount(T->rchild) + 1;
+        }
+
+        // 线索二叉树的结点结构
+        typedef struct BiThrNode
+        {
+            TElemType data;
+            BiThrNode *lchild, *rchild;
+            int LTag, RTag; // 0 表示指针，1 表示线索
+        } BiThrNode, *BiThrTree;
+
+        // 全局变量，用于中序线索化过程中的前驱节点
+        BiThrNode *pre = nullptr;
+
+        // 中序线索化（递归）
+        void InThreading(BiThrTree p)
+        {
+            if (p)
+            {
+                InThreading(p->lchild);
+                if (!p->lchild)
+                {
+                    p->LTag = 1;
+                    p->lchild = pre;
+                }
+                else
+                {
+                    p->LTag = 0;
+                }
+                if (pre && !pre->rchild)
+                {
+                    pre->RTag = 1;
+                    pre->rchild = p;
+                }
+                else if (pre)
+                {
+                    pre->RTag = 0;
+                }
+                pre = p;
+                InThreading(p->rchild);
+            }
+        }
+
+        // 构建中序线索二叉树（带头结点）
+        void CreateInOrderThread(BiThrTree & T)
+        {
+            BiThrTree head = new BiThrNode;
+            head->LTag = 0;
+            head->RTag = 1;
+            head->rchild = head;
+            pre = head;
+            head->lchild = T;
+            InThreading(T);
+            pre->rchild = head;
             pre->RTag = 1;
-            pre->rchild = p;
+            T = head;
         }
-        else
-        {
-            pre->RTag = 0;
-        }
-        pre = p;
-        InThreading(p->rchild);
-    }
-}
 
-// 遍历中序线索二叉树
-void InOrderTraverse_Thr(BiThrTree T)
-{
-    BiThrTree p = T->lchild;
-    while (p != T)
-    {
-        while (p->LTag == 0)
+        // 遍历中序线索二叉树（非递归）
+        void InOrderTraverse_Thr(BiThrTree T)
         {
-            p = p->lchild;
+            BiThrTree p = T->lchild;
+            while (p != T)
+            {
+                while (p->LTag == 0)
+                    p = p->lchild;
+                cout << p->data;
+                while (p->RTag == 1 && p->rchild != T)
+                {
+                    p = p->rchild;
+                    cout << p->data;
+                }
+                p = p->rchild;
+            }
         }
-        cout << p->data;
-        while (p->RTag == 1 && p->rchild != T)
-        {
-            p = p->rchild;
-            cout << p->data;
-        }
-        p = p->rchild;
-    }
-}

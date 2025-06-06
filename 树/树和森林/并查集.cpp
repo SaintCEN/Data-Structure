@@ -1,6 +1,3 @@
-#include <iostream>
-using namespace std;
-
 const int MAXN = 1000;
 int father[MAXN];
 int Rank[MAXN];
@@ -39,10 +36,4 @@ void Union(int x, int y)
         father[root_x] = root_y;
         Rank[root_y] += Rank[root_x];
     }
-}
-
-int main()
-{
-    init();
-    return 0;
 }

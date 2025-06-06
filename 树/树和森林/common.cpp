@@ -1,32 +1,20 @@
-#include <iostream>
-#include <vector>
-#include <list>
+#define MAXSIZE 100
 
-using namespace std;
-
-// 双亲表示法的节点结构
-struct ParentNode
+// 双亲表示法
+typedef struct
 {
     char data;
-    int parent; // -1表示没有双亲(根节点)
-};
-
-// 双亲表示法的树结构
-struct ParentTree
+    int parent;
+} PTNode;
+typedef struct
 {
-    vector<ParentNode> nodes;
-    int root;
-};
+    PTNode nodes[MAXSIZE];
+    int n;
+} PTree;
 
-struct ChildNode
+// 孩子表示法
+typedef struct CSNode
 {
     char data;
-    list<int> children; // 存储孩子节点的索引（在数组中的位置）
-};
-
-// 孩子表示法的树结构
-struct ChildTree
-{
-    vector<ChildNode> nodes; // 节点数组
-    int root;                // 根节点索引（-1 表示空树）
-};
+    struct CSNode *firstchild, *nextsibling;
+} CSNode, *CSTree;

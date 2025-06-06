@@ -1,216 +1,142 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <bits/stdc++.h>
+using namespace std;
 
-#define MVNum 100 // 最大顶点数
-#define OK 1
-#define ERROR 0
+#define MVNum 100
+#define INF 114154
 
-typedef char VerTexType; // 顶点类型
-typedef int ArcType;     // 边的权值类型
+typedef struct {
+    char vexs[MVNum];        
+    int arcs[MVNum][MVNum];  
+    int vexNum, arcNum;      
+} Graph;
 
-typedef struct
-{
-    VerTexType vexs[MVNum];     // 顶点表
-    ArcType arcs[MVNum][MVNum]; // 邻接矩阵
-    int vexnum, arcnum;         // 图的当前顶点数和边数
-} AMGraph;
-
-int LocateVex(AMGraph *G, VerTexType v)
-{
-    for (int i = 0; i < G->vexnum; i++)
-    {
-        if (G->vexs[i] == v)
-        {
+int LocateVex(const Graph &G, char v) {
+    for (int i = 0; i < G.vexNum; ++i) {
+        if (G.vexs[i] == v)
             return i;
-        }
     }
     return -1;
 }
 
-int CreateAOEGraph(AMGraph *G)
-{
-    scanf("%d", &G->vexnum);
-    scanf("%d", &G->arcnum);
-
-    for (int i = 0; i < G->vexnum; i++)
-    {
-        scanf(" %c", &G->vexs[i]);
+void CreateGraph(Graph &G) {
+    cin >> G.vexNum >> G.arcNum;
+    
+    for (int i = 0; i < G.vexNum; i++) {
+        cin >> G.vexs[i];
     }
-
-    // 初始化邻接矩阵
-    for (int i = 0; i < G->vexnum; i++)
-    {
-        for (int j = 0; j < G->vexnum; j++)
-        {
-            G->arcs[i][j] = 0;
+    
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            G.arcs[i][j] = 0;
         }
     }
-
-    for (int k = 0; k < G->arcnum; k++)
-    {
+    
+    for (int k = 0; k < G.arcNum; k++) {
         char v1, v2;
-        int weight;
-        scanf(" %c %c %d", &v1, &v2, &weight);
+        int w;
+        cin >> v1 >> v2 >> w;
         int i = LocateVex(G, v1);
         int j = LocateVex(G, v2);
-        if (i == -1 || j == -1)
-        {
-            return ERROR;
+        if (i != -1 && j != -1) {
+            G.arcs[i][j] = w;
         }
-        G->arcs[i][j] = weight;
     }
-    return OK;
 }
 
-int TopologicalOrder(AMGraph G, int *topoOrder)
-{
-    int inDegree[MVNum] = {0};
-
-    // 计算入度
-    for (int j = 0; j < G.vexnum; j++)
-    {
-        for (int i = 0; i < G.vexnum; i++)
-        {
-            if (G.arcs[i][j] != 0)
-            {
-                inDegree[j]++;
+bool TopologicalSort(Graph &G, vector<int> &topoOrder) {
+    vector<int> inDegree(G.vexNum, 0);
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            if (G.arcs[j][i] != 0) {
+                inDegree[i]++;
             }
         }
     }
-
-    int queue[MVNum];
-    int front = 0, rear = 0;
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        if (inDegree[i] == 0)
-        {
-            queue[rear++] = i;
+    
+    queue<int> q;
+    for (int i = 0; i < G.vexNum; i++) {
+        if (inDegree[i] == 0) {
+            q.push(i);
         }
     }
-
-    int count = 0;
-    while (front != rear)
-    {
-        int u = queue[front++];
-        topoOrder[count++] = u;
-
-        for (int v = 0; v < G.vexnum; v++)
-        {
-            if (G.arcs[u][v] != 0)
-            {
-                if (--inDegree[v] == 0)
-                {
-                    queue[rear++] = v;
+    
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+        topoOrder.push_back(v);
+        
+        for (int i = 0; i < G.vexNum; i++) {
+            if (G.arcs[v][i] != 0) {
+                inDegree[i]--;
+                if (inDegree[i] == 0) {
+                    q.push(i);
                 }
             }
         }
     }
-
-    if (count != G.vexnum)
-    {
-        return ERROR; // 存在环
-    }
-    return OK;
+    
+    return topoOrder.size() == G.vexNum;
 }
 
-void CalculateVE(AMGraph G, int *topoOrder, int *ve)
-{
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        ve[i] = 0;
-    }
-
-    for (int i = 0; i < G.vexnum; i++)
-    {
+void CalculateVE(Graph &G, const vector<int> &topoOrder, vector<int> &ve) {
+    // 初始化ve数组
+    ve.resize(G.vexNum, 0);
+    
+    // 按拓扑顺序计算ve
+    for (int i = 0; i < topoOrder.size(); i++) {
         int u = topoOrder[i];
-        for (int v = 0; v < G.vexnum; v++)
-        {
-            if (G.arcs[u][v] != 0 && ve[v] < ve[u] + G.arcs[u][v])
-            {
-                ve[v] = ve[u] + G.arcs[u][v];
+        for (int v = 0; v < G.vexNum; v++) {
+            if (G.arcs[u][v] != 0) {
+                ve[v] = max(ve[v], ve[u] + G.arcs[u][v]);
             }
         }
     }
 }
 
-void CalculateVL(AMGraph G, int *topoOrder, int *ve, int *vl)
-{
-    int maxVE = 0;
-    // 找到所有汇点的最大ve值
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        int isSink = 1;
-        for (int j = 0; j < G.vexnum; j++)
-        {
-            if (G.arcs[i][j] != 0)
-            {
-                isSink = 0;
-                break;
-            }
-        }
-        if (isSink && ve[i] > maxVE)
-        {
-            maxVE = ve[i];
-        }
-    }
-
-    // 初始化vl
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        vl[i] = maxVE;
-    }
-
-    // 逆拓扑处理
-    for (int i = G.vexnum - 1; i >= 0; i--)
-    {
+void CalculateVL(Graph &G, const vector<int> &topoOrder, const vector<int> &ve, vector<int> &vl) {
+    // 初始化vl数组
+    vl.resize(G.vexNum, ve[topoOrder.back()]);
+    
+    // 按逆拓扑顺序计算vl
+    for (int i = topoOrder.size() - 1; i >= 0; i--) {
         int u = topoOrder[i];
-        for (int v = 0; v < G.vexnum; v++)
-        {
-            if (G.arcs[u][v] != 0)
-            {
-                if (vl[u] > vl[v] - G.arcs[u][v])
-                {
-                    vl[u] = vl[v] - G.arcs[u][v];
+        for (int v = 0; v < G.vexNum; v++) {
+            if (G.arcs[u][v] != 0) {
+                vl[u] = min(vl[u], vl[v] - G.arcs[u][v]);
+            }
+        }
+    }
+}
+
+void FindCriticalPath(Graph &G, const vector<int> &ve, const vector<int> &vl) {
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            if (G.arcs[i][j] != 0) {
+                int e = ve[i];  // 活动最早开始时间
+                int l = vl[j] - G.arcs[i][j];  // 活动最晚开始时间
+                if (e == l) {  // 关键活动
+                    cout << G.vexs[i] << " " << G.vexs[j] << " " << G.arcs[i][j] << endl;
                 }
             }
         }
     }
 }
 
-void FindCriticalPath(AMGraph G, int *ve, int *vl)
-{
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        for (int j = 0; j < G.vexnum; j++)
-        {
-            if (G.arcs[i][j] != 0)
-            {
-                int e = ve[i];
-                int l = vl[j] - G.arcs[i][j];
-                if (e == l)
-                {
-                    printf("%c -> %c, 权值: %d\n", G.vexs[i], G.vexs[j], G.arcs[i][j]);
-                }
-            }
-        }
+int main() {
+    Graph G;
+    CreateGraph(G);
+    
+    vector<int> topoOrder;
+    if (!TopologicalSort(G, topoOrder)) {
+        cout << "ERROR" << endl;
+        return 0;
     }
-}
-
-int main()
-{
-    AMGraph G;
-    int topoOrder[MVNum];
-
-    if (TopologicalOrder(G, topoOrder) == ERROR)
-    {
-        return 1;
-    }
-
-    int ve[MVNum], vl[MVNum];
+    
+    vector<int> ve, vl;
     CalculateVE(G, topoOrder, ve);
     CalculateVL(G, topoOrder, ve, vl);
-
+    
     FindCriticalPath(G, ve, vl);
-
+    
     return 0;
 }

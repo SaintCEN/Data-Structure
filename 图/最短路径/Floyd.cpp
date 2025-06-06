@@ -1,20 +1,17 @@
-#include <iostream>
-#include <climits>
+#include <bits/stdc++.h>
 using namespace std;
 
-#define MVNum 100 // 假设最大顶点数为100
-
-const int INF = INT_MAX;
+#define MVNum 100
+#define INF 114154
 
 typedef struct
 {
-    char vexs[MVNum];       // 顶点表
-    int arcs[MVNum][MVNum]; // 邻接矩阵
-    int vexNum, arcNum;     // 顶点数和边数
-} AMGraph;
+    char vexs[MVNum];       
+    int arcs[MVNum][MVNum]; 
+    int vexNum, arcNum;     
+} Graph;
 
-// 定位顶点
-int LocateVex(const AMGraph &G, char v)
+int LocateVex(const Graph &G, char v)
 {
     for (int i = 0; i < G.vexNum; ++i)
     {
@@ -24,69 +21,94 @@ int LocateVex(const AMGraph &G, char v)
     return -1;
 }
 
-void Floyd(const AMGraph &G, int dist[][MVNum])
+void Create(Graph &G)
 {
-    // 初始化距离矩阵
-    for (int i = 0; i < G.vexNum; ++i)
+    cin >> G.vexNum >> G.arcNum;
+    for (int i = 1; i <= G.vexNum; i++)
     {
-        for (int j = 0; j < G.vexNum; ++j)
+        cin >> G.vexs[i];
+    }
+    for (int i = 1; i <= G.vexNum; i++)
+    {
+        for(int j=1;j<=G.vexNum;j++)
         {
-            dist[i][j] = G.arcs[i][j];
+            G.arcs[i][j]=INF;
+            if(i==j)
+            {
+                G.arcs[i][j]=0;
+            }
         }
     }
-
-    // 三重循环更新最短路径
-    for (int k = 0; k < G.vexNum; ++k)
+    for (int k = 1; k <= G.arcNum; k++)
     {
-        for (int i = 0; i < G.vexNum; ++i)
+        char v1, v2;
+        int w;
+        cin >> v1 >> v2 >> w;
+        int i = LocateVex(G, v1);
+        int j = LocateVex(G, v2);
+        if (i != -1 && j != -1)
         {
-            for (int j = 0; j < G.vexNum; ++j)
-            {
-                if (dist[i][k] != INF && dist[k][j] != INF && dist[i][j] > dist[i][k] + dist[k][j])
-                {
+            G.arcs[i][j] = w;
+        }
+    }
+}
+
+void Floyd(Graph &G)
+{
+    int n = G.vexNum;
+    vector<vector<int>> dist(n + 1, vector<int>(n + 1));
+    vector<vector<int>> path(n + 1, vector<int>(n + 1, -1));
+    
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= n; j++) {
+            dist[i][j] = G.arcs[i][j];
+            if(dist[i][j] < INF && i != j) {
+                path[i][j] = i;  
+            }
+        }
+    }
+    
+    for(int k = 1; k <= n; k++) {  
+        for(int i = 1; i <= n; i++) {  
+            for(int j = 1; j <= n; j++) {  
+                if(dist[i][k] != INF && dist[k][j] != INF && 
+                   dist[i][k] + dist[k][j] < dist[i][j]) {
                     dist[i][j] = dist[i][k] + dist[k][j];
+                    path[i][j] = path[k][j];  
+                }
+            }
+        }
+    }
+    
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= n; j++) {
+            if(i != j) {
+                cout << G.vexs[i] << " " << G.vexs[j];
+                if(dist[i][j] == INF) {
+                    cout << "Invalid." << endl;
+                } else {
+                    cout << dist[i][j] << endl;
+                    cout << G.vexs[i];
+                    int k = path[i][j];
+                    vector<int> route;
+                    while(k != -1) {
+                        route.push_back(k);
+                        k = path[i][k];
+                    }
+                    for(int r = route.size()-1; r >= 0; r--) {
+                        cout << " -> " << G.vexs[route[r]];
+                    }
+                    cout << " -> " << G.vexs[j] << endl;
                 }
             }
         }
     }
 }
 
-void CreateAMGraph(AMGraph &G)
-{
-    cin >> G.vexNum >> G.arcNum;
-
-    for (int i = 0; i < G.vexNum; ++i)
-        cin >> G.vexs[i];
-
-    for (int i = 0; i < G.vexNum; ++i)
-        for (int j = 0; j < G.vexNum; ++j)
-            G.arcs[i][j] = (i == j) ? 0 : INF;
-
-    for (int k = 0; k < G.arcNum; ++k)
-    {
-        char v1, v2;
-        int weight;
-        cin >> v1 >> v2 >> weight;
-        int i = LocateVex(G, v1);
-        int j = LocateVex(G, v2);
-        G.arcs[i][j] = weight;
-    }
-}
-
 int main()
 {
-    AMGraph G;
-    CreateAMGraph(G);
-
-    int dist[MVNum][MVNum];
-    Floyd(G, dist);
-
-    for (int j = 0; j < G.vexNum; ++j)
-    {
-        if (dist[0][j] != INF)
-            cout << "Distance from " << G.vexs[0] << " to " << G.vexs[j] << ": " << dist[0][j] << endl;
-        else
-            cout << "No path from " << G.vexs[0] << " to " << G.vexs[j] << endl;
-    }
+    Graph G;
+    Create(G);
+    Floyd(G);
     return 0;
 }
