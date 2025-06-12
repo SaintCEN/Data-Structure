@@ -1,10 +1,12 @@
 #include <iostream>
+#include <vector>
 using namespace std;
 
 const int MVNum = 100;
 bool visited[MVNum];
+vector<int> path;  
 
-struct Graph
+struct AMGraph
 {
     int arcs[MVNum][MVNum];
     int vexnum, arcnum;
@@ -27,44 +29,11 @@ struct ALGraph
     int vexnum, arcnum;
 };
 
-int FirstAdjVex(Graph G, int v)
+void DFS_AM(AMGraph G, int v)
 {
-    for (int i = 0; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-int NextAdjVex(Graph G, int v, int w)
-{
-    for (int i = w + 1; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-void DFS(Graph G, int v)
-{
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
-    for (int w = FirstAdjVex(G, v); w >= 0; w = NextAdjVex(G, v, w))
-        if (!visited[w])
-            DFS(G, w);
-}
-
-void DFSTraverse(Graph G)
-{
-    for (int i = 0; i < G.vexnum; ++i)
-        visited[i] = false;
-    for (int i = 0; i < G.vexnum; ++i)
-        if (!visited[i])
-            DFS(G, i);
-}
-
-void DFS_AM(Graph G, int v)
-{
-    cout << v;
-    visited[v] = true;
+    path.push_back(v);
     for (int w = 0; w < G.vexnum; w++)
         if (G.arcs[v][w] && !visited[w])
             DFS_AM(G, w);
@@ -72,8 +41,9 @@ void DFS_AM(Graph G, int v)
 
 void DFS_AL(ALGraph G, int v)
 {
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
+    path.push_back(v);
     ArcNode *p = G.vertices[v].firstarc;
     while (p)
     {
@@ -82,4 +52,34 @@ void DFS_AL(ALGraph G, int v)
             DFS_AL(G, w);
         p = p->nextarc;
     }
+}
+
+void DFSTraverse_AM(AMGraph G)
+{
+    path.clear();
+    for (int i = 0; i < G.vexnum; ++i)
+        visited[i] = false;
+    for (int i = 0; i < G.vexnum; ++i)
+        if (!visited[i])
+            DFS_AM(G, i);
+}
+
+void DFSTraverse_AL(ALGraph G)
+{
+    path.clear();
+    for (int i = 0; i < G.vexnum; ++i)
+        visited[i] = false;
+    for (int i = 0; i < G.vexnum; ++i)
+        if (!visited[i])
+            DFS_AL(G, i);
+}
+
+void PrintPath()
+{
+    for (size_t i = 0; i < path.size(); ++i) {
+        cout << path[i];
+        if (i < path.size() - 1)
+            cout << " -> ";
+    }
+    cout << endl;
 }

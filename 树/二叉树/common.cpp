@@ -178,7 +178,7 @@ void CreateBiTree(BiTree &T)
         T->data = ch;
         CreateBiTree(T->rchild);
     }
-
+}
     // 根据后序输入创建二叉树，'#'表示空节点
     void CreateBiTree(BiTree & T)
     {
@@ -195,7 +195,7 @@ void CreateBiTree(BiTree &T)
             T = new BiTNode;
             T->data = ch;
         }
-
+    }
         // 计算二叉树的高度
         int Depth(BiTree T)
         {

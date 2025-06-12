@@ -1,11 +1,13 @@
 #include <iostream>
+#include <vector>
 #include <queue>
 using namespace std;
 
 const int MVNum = 100;
 bool visited[MVNum];
+vector<int> path;  
 
-struct Graph
+struct AMGraph
 {
     int arcs[MVNum][MVNum];
     int vexnum, arcnum;
@@ -28,50 +30,14 @@ struct ALGraph
     int vexnum, arcnum;
 };
 
-int FirstAdjVex(Graph G, int v)
-{
-    for (int i = 0; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-int NextAdjVex(Graph G, int v, int w)
-{
-    for (int i = w + 1; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-void BFS(Graph G, int v)
+void BFS_AM(AMGraph G, int v)
 {
     queue<int> Q;
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
+    path.push_back(v);
     Q.push(v);
-    while (!Q.empty())
-    {
-        int u = Q.front();
-        Q.pop();
-        for (int w = FirstAdjVex(G, u); w >= 0; w = NextAdjVex(G, u, w))
-        {
-            if (!visited[w])
-            {
-                cout << w;
-                visited[w] = true;
-                Q.push(w);
-            }
-        }
-    }
-}
-
-void BFS_AM(Graph G, int v)
-{
-    queue<int> Q;
-    cout << v;
-    visited[v] = true;
-    Q.push(v);
+    
     while (!Q.empty())
     {
         int u = Q.front();
@@ -80,8 +46,9 @@ void BFS_AM(Graph G, int v)
         {
             if (G.arcs[u][w] && !visited[w])
             {
-                cout << w;
+                cout << w << " ";
                 visited[w] = true;
+                path.push_back(w);
                 Q.push(w);
             }
         }
@@ -91,9 +58,11 @@ void BFS_AM(Graph G, int v)
 void BFS_AL(ALGraph G, int v)
 {
     queue<int> Q;
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
+    path.push_back(v);
     Q.push(v);
+    
     while (!Q.empty())
     {
         int u = Q.front();
@@ -104,8 +73,9 @@ void BFS_AL(ALGraph G, int v)
             int w = p->adjvex;
             if (!visited[w])
             {
-                cout << w;
+                cout << w << " ";
                 visited[w] = true;
+                path.push_back(w);
                 Q.push(w);
             }
             p = p->nextarc;
@@ -113,8 +83,9 @@ void BFS_AL(ALGraph G, int v)
     }
 }
 
-void BFSTraverse(Graph G)
+void BFSTraverse_AM(AMGraph G)
 {
+    path.clear();
     for (int i = 0; i < G.vexnum; ++i)
         visited[i] = false;
     for (int i = 0; i < G.vexnum; ++i)
@@ -122,11 +93,22 @@ void BFSTraverse(Graph G)
             BFS_AM(G, i);
 }
 
-void BFSTraverse(ALGraph G)
+void BFSTraverse_AL(ALGraph G)
 {
+    path.clear();
     for (int i = 0; i < G.vexnum; ++i)
         visited[i] = false;
     for (int i = 0; i < G.vexnum; ++i)
         if (!visited[i])
             BFS_AL(G, i);
+}
+
+void PrintPath()
+{
+    for (size_t i = 0; i < path.size(); ++i) {
+        cout << path[i];
+        if (i < path.size() - 1)
+            cout << " -> ";
+    }
+    cout << endl;
 }

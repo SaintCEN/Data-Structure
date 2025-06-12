@@ -463,6 +463,8 @@ typedef struct
 
 ```c++
 #include<stack>
+using namespace std;
+int main(){
 stack<int> s1;
 s1.push(2);
 s1.push(1);
@@ -470,13 +472,13 @@ cout << s1.size() << endl;
 s1.pop();
 s1.pop();
 cout << s1.empty() << endl;
+}
 ```
 
 ### 队列
 
 ```c++
 #include<iostream>
-
 using namespace std;
 
 #define maxsize 100
@@ -637,7 +639,8 @@ ElemType GetFront(LinkQueue Q) {
 #include<iostream>
 using namespace std;
 
-// 单项队列
+int main(){
+// 单向队列
 queue<int> q1;
 q1.push(2);
 q1.push(1);
@@ -656,6 +659,7 @@ dq.pop_back();
 dq.pop_back();      
 cout << dq.size() << endl;   
 cout << dq.empty() << endl;   
+}
 ```
 
 #### 优先队列（priority_queue)
@@ -742,6 +746,7 @@ typedef struct{
 #include<iostream>
 using namespace std;
 
+int main(){
 vector<int> vec;
 vec.push_back(1);   
 vec.push_back(2);   
@@ -756,7 +761,7 @@ cout << vec[1] << endl;
 vec.clear();                   
 cout << vec.empty() << endl;   
 
-vector<vector<int>> matrix(3, vector<int>(2, 0));// 3列，2行，每行填充0 
+vector<vector<int>> matrix(3, vector<int>(2, 0));// 3行，2列，每行填充0 
 matrix[0][0] = 1;   
 matrix[1].push_back(3);  
 vector<int> new_row = {5, 7, 9};
@@ -766,6 +771,7 @@ for (int i = 0; i < matrix.size(); i++) {
           cout << matrix[i][j] << " ";
     }
     cout << endl;
+}
 }
 ```
 
@@ -877,9 +883,9 @@ void KMP(const string &t, const string &j) {
 ```c++
 #include <iostream>
 #include <string>
-
 using namespace std;
 
+int main(){
 string s = "hello, world";
 cout << s.size() << endl;
 size_t pos1 = s.find('o');
@@ -889,6 +895,7 @@ string s2 = s;
 s2.insert(5, " C++");
 string s3 = s;
 s3.replace(0, 5, "Hi");
+}
 ```
 
 ### 广义表
@@ -924,7 +931,7 @@ using namespace std;
 
 typedef int TElemType;
 
-// 顺序存储结构（即层序遍历，空结点值可以为0）
+// 顺序存储结构（即层序遍历，空结点值为0）
 typedef struct{
     TElemType data[MAXSIZE];
 }SqBiTree;
@@ -988,7 +995,7 @@ void PreOrderTraverse_NonRecursive(BiTree T) {
         BiTree q = s.top();
         s.pop();
         cout << q->data;
-        if (q->rchild) s.push(q->rchild);
+        if (q->rchild) s.push(q->rchild); // 右子树后访问 根据栈先进后出的原则先进
         if (q->lchild) s.push(q->lchild);
     }
 }
@@ -1108,7 +1115,7 @@ void InThreading(BiThrTree p) {
         if (pre && !pre->rchild) {
             pre->RTag = 1;
             pre->rchild = p;
-        } else if (pre) {
+        } else if {
             pre->RTag = 0;
         }
         pre = p;
@@ -1462,7 +1469,7 @@ void CreateAL(ALGraph &G)
         int i = LocateVex(G, v1); 
         int j = LocateVex(G, v2);
 
-        // 添加边 v1 -> v2
+        // 添加边 v1 -> v2 头插法
         ArcNode *p1 = new ArcNode;
         p1->adjvex = j;
         p1->weight = weight;
@@ -1533,12 +1540,14 @@ typedef struct {
 
 ```c++
 #include <iostream>
+#include <vector>
 using namespace std;
 
 const int MVNum = 100;
 bool visited[MVNum];
+vector<int> path;  
 
-struct Graph
+struct AMGraph
 {
     int arcs[MVNum][MVNum];
     int vexnum, arcnum;
@@ -1561,44 +1570,11 @@ struct ALGraph
     int vexnum, arcnum;
 };
 
-int FirstAdjVex(Graph G, int v)
+void DFS_AM(AMGraph G, int v)
 {
-    for (int i = 0; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-int NextAdjVex(Graph G, int v, int w)
-{
-    for (int i = w + 1; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-void DFS(Graph G, int v)
-{
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
-    for (int w = FirstAdjVex(G, v); w >= 0; w = NextAdjVex(G, v, w))
-        if (!visited[w])
-            DFS(G, w);
-}
-
-void DFSTraverse(Graph G)
-{
-    for (int i = 0; i < G.vexnum; ++i)
-        visited[i] = false;
-    for (int i = 0; i < G.vexnum; ++i)
-        if (!visited[i])
-            DFS(G, i);
-}
-
-void DFS_AM(Graph G, int v)
-{
-    cout << v;
-    visited[v] = true;
+    path.push_back(v);
     for (int w = 0; w < G.vexnum; w++)
         if (G.arcs[v][w] && !visited[w])
             DFS_AM(G, w);
@@ -1606,8 +1582,9 @@ void DFS_AM(Graph G, int v)
 
 void DFS_AL(ALGraph G, int v)
 {
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
+    path.push_back(v);
     ArcNode *p = G.vertices[v].firstarc;
     while (p)
     {
@@ -1617,19 +1594,51 @@ void DFS_AL(ALGraph G, int v)
         p = p->nextarc;
     }
 }
+
+void DFSTraverse_AM(AMGraph G)
+{
+    path.clear();
+    for (int i = 0; i < G.vexnum; ++i)
+        visited[i] = false;
+    for (int i = 0; i < G.vexnum; ++i)
+        if (!visited[i])
+            DFS_AM(G, i);
+}
+
+void DFSTraverse_AL(ALGraph G)
+{
+    path.clear();
+    for (int i = 0; i < G.vexnum; ++i)
+        visited[i] = false;
+    for (int i = 0; i < G.vexnum; ++i)
+        if (!visited[i])
+            DFS_AL(G, i);
+}
+
+void PrintPath()
+{
+    for (size_t i = 0; i < path.size(); ++i) {
+        cout << path[i];
+        if (i < path.size() - 1)
+            cout << " -> ";
+    }
+    cout << endl;
+}
 ```
 
 **BFS**
 
 ```c++
 #include <iostream>
+#include <vector>
 #include <queue>
 using namespace std;
 
 const int MVNum = 100;
 bool visited[MVNum];
+vector<int> path;  
 
-struct Graph
+struct AMGraph
 {
     int arcs[MVNum][MVNum];
     int vexnum, arcnum;
@@ -1652,50 +1661,14 @@ struct ALGraph
     int vexnum, arcnum;
 };
 
-int FirstAdjVex(Graph G, int v)
-{
-    for (int i = 0; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-int NextAdjVex(Graph G, int v, int w)
-{
-    for (int i = w + 1; i < G.vexnum; ++i)
-        if (G.arcs[v][i])
-            return i;
-    return -1;
-}
-
-void BFS(Graph G, int v)
+void BFS_AM(AMGraph G, int v)
 {
     queue<int> Q;
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
+    path.push_back(v);
     Q.push(v);
-    while (!Q.empty())
-    {
-        int u = Q.front();
-        Q.pop();
-        for (int w = FirstAdjVex(G, u); w >= 0; w = NextAdjVex(G, u, w))
-        {
-            if (!visited[w])
-            {
-                cout << w;
-                visited[w] = true;
-                Q.push(w);
-            }
-        }
-    }
-}
-
-void BFS_AM(Graph G, int v)
-{
-    queue<int> Q;
-    cout << v;
-    visited[v] = true;
-    Q.push(v);
+    
     while (!Q.empty())
     {
         int u = Q.front();
@@ -1704,8 +1677,9 @@ void BFS_AM(Graph G, int v)
         {
             if (G.arcs[u][w] && !visited[w])
             {
-                cout << w;
+                cout << w << " ";
                 visited[w] = true;
+                path.push_back(w);
                 Q.push(w);
             }
         }
@@ -1715,9 +1689,11 @@ void BFS_AM(Graph G, int v)
 void BFS_AL(ALGraph G, int v)
 {
     queue<int> Q;
-    cout << v;
+    cout << v << " ";
     visited[v] = true;
+    path.push_back(v);
     Q.push(v);
+    
     while (!Q.empty())
     {
         int u = Q.front();
@@ -1728,8 +1704,9 @@ void BFS_AL(ALGraph G, int v)
             int w = p->adjvex;
             if (!visited[w])
             {
-                cout << w;
+                cout << w << " ";
                 visited[w] = true;
+                path.push_back(w);
                 Q.push(w);
             }
             p = p->nextarc;
@@ -1737,8 +1714,9 @@ void BFS_AL(ALGraph G, int v)
     }
 }
 
-void BFSTraverse(Graph G)
+void BFSTraverse_AM(AMGraph G)
 {
+    path.clear();
     for (int i = 0; i < G.vexnum; ++i)
         visited[i] = false;
     for (int i = 0; i < G.vexnum; ++i)
@@ -1746,13 +1724,24 @@ void BFSTraverse(Graph G)
             BFS_AM(G, i);
 }
 
-void BFSTraverse(ALGraph G)
+void BFSTraverse_AL(ALGraph G)
 {
+    path.clear();
     for (int i = 0; i < G.vexnum; ++i)
         visited[i] = false;
     for (int i = 0; i < G.vexnum; ++i)
         if (!visited[i])
             BFS_AL(G, i);
+}
+
+void PrintPath()
+{
+    for (size_t i = 0; i < path.size(); ++i) {
+        cout << path[i];
+        if (i < path.size() - 1)
+            cout << " -> ";
+    }
+    cout << endl;
 }
 ```
 
@@ -1761,211 +1750,201 @@ void BFSTraverse(ALGraph G)
 **Kruskal**
 
 ```c++
-#include <iostream>
-#include <queue>
-#include <vector>
-#include <climits>
-
+#include<bits/stdc++.h>
 using namespace std;
 
-#define MVNum 100
+#define MAXVEX 100
+#define INF 114514
 
-struct AMGraph
-{
-    char vexs[MVNum];       // 结点
-    int arcs[MVNum][MVNum]; // 边
-    int vexnum, arcnum;     // 结点总数 边总数
-};
+typedef struct {
+    int adjvex;
+    int weight;
+    struct ArcNode *next;
+} ArcNode;
 
-struct Edge
-{
-    int u, v;   // 边的两个顶点索引
-    int weight; // 边的权值
-};
+typedef struct {
+    ArcNode *firstarc;
+} AdjList[MAXVEX];
 
-struct Compare // 优先队列排序定义 取最小
-{
-    bool operator()(const struct Edge &e1, const struct Edge &e2)
-    {
-        return e1.weight > e2.weight;
+typedef struct {
+    AdjList vertices;
+    int vexnum, arcnum;
+} Graph;
+
+bool hasCycle(Graph &G, int from, int to, vector<bool>& visited, int parent) {
+    visited[from] = true;
+    ArcNode* p = G.vertices[from].firstarc;
+    while(p) {
+        int next = p->adjvex;
+        if(!visited[next]) {
+        if(hasCycle(G, next, to, visited, from)) {
+                return true;
+            }
+        }
+        else if( next != parent && next == to) {
+            return true;
+        }
+        p = p->next;
     }
-};
+    return false;
+}
 
-// 并查集
-int parent[MVNum];
+bool isSafe(Graph &G, int from, int to) {
+    vector<bool> visited(G.vexnum + 1, false);
+    return !hasCycle(G, from, to, visited, -1);
+}
 
-void InitParent(int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        parent[i] = i;
+void CreateGraph(Graph &G) {
+    cin >> G.vexnum >> G.arcnum;
+    for(int i=1; i<=G.vexnum; i++) {
+        G.vertices[i].firstarc = nullptr;
+    }
+    for(int i=1; i<=G.arcnum; i++) {
+        int m,n,w;
+        cin >> m >> n >> w;
+        ArcNode *p1 = new ArcNode;
+        p1->adjvex = n;
+        p1->weight = w;
+        p1->next = G.vertices[m].firstarc;
+        G.vertices[m].firstarc = p1;
+        
+        ArcNode *p2 = new ArcNode;
+        p2->adjvex = m;
+        p2->weight = w;
+        p2->next = G.vertices[n].firstarc;
+        G.vertices[n].firstarc = p2;
     }
 }
 
-int Find(int x)
-{
-    if (parent[x] != x)
-    {
-        parent[x] = Find(parent[x]); // Path compression
-    }
-    return parent[x];
-}
-
-void Union(int x, int y)
-{
-    int rootX = Find(x);
-    int rootY = Find(y);
-    if (rootX != rootY)
-    {
-        parent[rootX] = rootY;
-    }
-}
-
-// Kruskal算法
-void Kruskal(AMGraph &G)
-{
-    // 初始化并查集
-    InitParent(G.vexnum);
-
-    priority_queue<struct Edge, vector<struct Edge>, Compare> pq;
-
-    // 遍历邻接矩阵，将所有有效边加入优先队列
-    for (int i = 0; i < G.vexnum; ++i)
-    {
-        for (int j = i + 1; j < G.vexnum; ++j)
-        { // 从 i+1 开始，避免重复边（如 (i,j) 和 (j,i)）
-            if (G.arcs[i][j] != INT_MAX && G.arcs[i][j] > 0)
-            {                            // 检查是否存在有效边（权重非无穷且大于0）
-                struct Edge e;           // 创建边结构体对象
-                e.u = i;                 // 设置边的起点顶点索引
-                e.v = j;                 // 设置边的终点顶点索引
-                e.weight = G.arcs[i][j]; // 设置边的权重
-                pq.push(e);              // 将边压入优先队列
+void PrintMST(vector<vector<int>> &mst, int n) {
+    for(int i=1; i<=n; i++) {
+        for(int j=i+1; j<=n; j++) {
+            if(mst[i][j] != 0) {
+                cout << i << " " << j << endl;
             }
         }
     }
+}
 
-    int edgeCount = 0; // 记录已加入最小生成树的边数
-    while (!pq.empty() && edgeCount < G.vexnum - 1)
-    {                             // 循环直到队列为空或边数达到顶点数-1
-        struct Edge e = pq.top(); // 取出权重最小的边
-        pq.pop();                 // 从优先队列中移除该边
-
-        int rootU = Find(e.u); // 查找起点顶点所在集合的根
-        int rootV = Find(e.v); // 查找终点顶点所在集合的根
-
-        if (rootU != rootV)
-        { // 若两顶点不在同一集合，加入该边不会形成环
-            cout << G.vexs[e.u] << " -> " << G.vexs[e.v] << " : " << e.weight << endl;
-            Union(e.u, e.v); // 合并两顶点的集合
-            edgeCount++;
+int main() {
+    Graph G;
+    CreateGraph(G);
+    vector<vector<int>> mst(G.vexnum+1, vector<int>(G.vexnum+1, 0));
+    int MSTedge = 0;
+    
+    while(MSTedge < G.vexnum-1) {
+        int min = INF;
+        int p1 = -1, p2 = -1;
+        
+        for(int i=1; i<=G.vexnum; i++) {
+            ArcNode *p = G.vertices[i].firstarc;
+            while(p) {
+                if(p->weight < min && !mst[i][p->adjvex] && isSafe(G, i, p->adjvex)) {
+                    min = p->weight;
+                    p1 = i;
+                    p2 = p->adjvex;
+                }
+                p = p->next;
+            }
         }
+        
+        if(p1 == -1) {
+            cout << "Invalid." << endl;
+            return 1;
+        }
+        
+        mst[p1][p2] = 1;
+        mst[p2][p1] = 1;
+        MSTedge++;
     }
-
-    if (edgeCount < G.vexnum - 1)
-    { // 如果边数不足顶点数-1，说明图不连通
-        return;
-    }
+    
+    PrintMST(mst, G.vexnum);
+    return 0;
 }
 ```
 
 **Prim**
 
 ```c++
-#include <iostream>
-#include <climits>
-
+#include<bits/stdc++.h>
 using namespace std;
 
-#define MVNum 100
+#define INF 32366
+#define MAX_VERTICES 100
 
-typedef char VerTexType;
-typedef int ArcType;
+typedef struct {
+    int edges[MAX_VERTICES][MAX_VERTICES];
+    int edgeCount;
+    int vertexCount;
+} Graph;
 
-struct AMGraph
-{
-    VerTexType vexs[MVNum];
-    ArcType arcs[MVNum][MVNum];
-    int vexnum, arcnum;
-};
-
-struct CloseEdge
-{
-    VerTexType adjvex; // 该顶点在生成树中的邻接顶点
-    ArcType lowcost;   // 最小权值，0表示已加入生成树
-} closedge[MVNum];
-
-// 查找顶点u在G.vexs中的下标
-int LocateVex(const AMGraph &G, VerTexType u)
-{
-    for (int i = 0; i < G.vexnum; ++i)
-    {
-        if (G.vexs[i] == u)
-            return i;
+void printMST(vector<vector<int>>& mst, int n) {
+    for(int i = 1; i <= n; i++) {
+        for(int j = i + 1; j <= n; j++) {
+            if(mst[i][j] == 1) {
+                cout << i << " - " << j << endl;
+            }
+        }
     }
-    return -1;
 }
 
-void Prim(AMGraph G, VerTexType u)
-{
-    int k = LocateVex(G, u);
-
-    if (k == -1)
-    {
-        return;
-    }
-
-    // 初始化closedge数组
-    for (int i = 0; i < G.vexnum; ++i)
-    {
-        if (i != k)
-        {                                       // 如果不是起始顶点u
-            closedge[i].adjvex = u;             // 初始时，所有顶点的最近邻接顶点都是u
-            closedge[i].lowcost = G.arcs[k][i]; // 初始时，最小权值就是u到该顶点的权值
-        }
-        else
-        {
-            closedge[i].lowcost = 0; // u自身已加入生成树，lowcost设为0
+int main() {
+    int n;
+    cin >> n;
+    
+    Graph g;
+    g.edgeCount = n - 1;
+    g.vertexCount = n;
+    
+    for (int i = 1; i <= n; i++) {
+        for(int j = 1; j <= n; j++) {
+            g.edges[i][j] = INF;
         }
     }
+    
+    for(int i = 1; i <= n; i++) {
+        int from, to, weight;
+        cin >> from >> to >> weight;
+        g.edges[from][to] = weight;
+        g.edges[to][from] = weight;
+    }
 
-    // 构建生成树的n-1条边
-    for (int i = 1; i < G.vexnum; ++i)
-    {
-        // 寻找当前最小的边
-        int min_cost = INT_MAX;
-        int min_index = -1;
-        for (int j = 0; j < G.vexnum; ++j)
-        {
-            if (closedge[j].lowcost > 0 && closedge[j].lowcost < min_cost)
-            {
-                min_cost = closedge[j].lowcost;
-                min_index = j;
+    vector<bool> visited(n + 1, false);
+    vector<vector<int>> mst(n + 1, vector<int>(n + 1, 0));
+    visited[1] = true;
+    int mstEdgeCount = 0;
+
+    while(mstEdgeCount < n - 1) {
+        int minWeight = INF;
+        int minFrom = -1;
+        int minTo = -1;
+
+        for(int i = 1; i <= n; i++) {
+            if(visited[i]) {
+                for(int j = 1; j <= n; j++) {
+                    if(!visited[j] && g.edges[i][j] < minWeight) {
+                        minWeight = g.edges[i][j];
+                        minFrom = i;
+                        minTo = j;
+                    }
+                }
             }
         }
 
-        if (min_index == -1)
-        { // 图不连通，无法生成树
-            return;
+        if(minFrom == -1) {
+            cout << "Invalid." << endl;
+            return 1;
         }
 
-        // 输出最小生成树的边
-        cout << closedge[min_index].adjvex << " -> "
-             << G.vexs[min_index] << " : " << min_cost << endl;
-
-        // 将顶点min_index加入生成树
-        closedge[min_index].lowcost = 0;
-
-        // 更新closedge数组
-        for (int j = 0; j < G.vexnum; ++j)
-        {
-            if (closedge[j].lowcost != 0 && G.arcs[min_index][j] < closedge[j].lowcost) // 更新到最小生成树的最短权值
-            {
-                closedge[j].adjvex = G.vexs[min_index];
-                closedge[j].lowcost = G.arcs[min_index][j];
-            }
-        }
+        mst[minFrom][minTo] = 1;
+        mst[minTo][minFrom] = 1;
+        visited[minTo] = true;
+        mstEdgeCount++;
     }
+
+    printMST(mst, n);
+    
+    return 0;
 }
 ```
 
@@ -1974,23 +1953,20 @@ void Prim(AMGraph G, VerTexType u)
 **Dijkstra**
 
 ```c++
-#include <iostream>
-#include <climits>
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
 
 #define MVNum 100
+#define INF 114154
 
 typedef struct
 {
-    char vexs[MVNum];       // 顶点表
-    int arcs[MVNum][MVNum]; // 邻接矩阵
-    int vexNum, arcNum;     // 节点数 边数
-} AMGraph;
+    char vexs[MVNum];       
+    int arcs[MVNum][MVNum]; 
+    int vexNum, arcNum;     
+} Graph;
 
-// 定位节点
-int LocateVex(const AMGraph &G, char v)
+int LocateVex(const Graph &G, char v)
 {
     for (int i = 0; i < G.vexNum; ++i)
     {
@@ -2000,23 +1976,25 @@ int LocateVex(const AMGraph &G, char v)
     return -1;
 }
 
-// 初始化邻接矩阵图
-void CreateAMGraph(AMGraph &G)
+void Create(Graph &G)
 {
     cin >> G.vexNum >> G.arcNum;
-    // 输入顶点字符
-    for (int i = 0; i < G.vexNum; ++i)
+    for (int i = 1; i <= G.vexNum; i++)
     {
         cin >> G.vexs[i];
     }
-    // 初始化邻接矩阵
-    for (int i = 0; i < MVNum; ++i)
+    for (int i = 1; i <= G.vexNum; i++)
     {
-        fill(G.arcs[i], G.arcs[i] + MVNum, INT_MAX);
-        G.arcs[i][i] = 0;
+        for(int j=1;j<=G.vexNum;j++)
+        {
+            G.arcs[i][j]=INF;
+            if(i==j)
+            {
+                G.arcs[i][j]=0;
+            }
+        }
     }
-    // 输入边信息
-    for (int k = 0; k < G.arcNum; ++k)
+    for (int k = 1; k <= G.arcNum; k++)
     {
         char v1, v2;
         int w;
@@ -2030,110 +2008,67 @@ void CreateAMGraph(AMGraph &G)
     }
 }
 
-void ShortestPath_DIJ(const AMGraph &G, char start)
-{
-    int v0 = LocateVex(G, start); // 将字符顶点转化为索引
-    if (v0 == -1)
-    {
-        return;
-    }
-
-    int n = G.vexNum;        // 顶点总数
-    int dist[MVNum];         // 存储源点到各点的最短距离
-    int path[MVNum];         // 存储路径前驱节点
-    bool S[MVNum] = {false}; // 标记顶点是否已处理
-
-    // 初始化数组
-    for (int i = 0; i < n; ++i)
-    {
-        dist[i] = G.arcs[v0][i]; // 初始化为源点到各点的直接距离
-        if (dist[i] != INT_MAX)
-        { // 可到达则设前驱为源点
-            path[i] = v0;
-        }
-        else
-        {
-            path[i] = -1;
-        }
-    }
-    dist[v0] = 0;  // 自身距离为0
-    S[v0] = true;  // 标记为已处理
-    path[v0] = -1; // 源点无前驱
-
-    // 主循环：进行n-1次迭代（每次确定一个顶点的最短路径）
-    for (int i = 1; i < n; i++)
-    {
-        int minDist = INT_MAX; // 当前未处理顶点中的最小距离
-        int u = -1;            // 最小距离顶点索引（初始-1表示未找到）
-
-        // 遍历所有顶点寻找最小值
-        for (int j = 0; j < n; ++j)
-        {
-            // 仅处理未确定最短路径的顶点
-            // 且当前顶点的距离比已记录的最小值更小
-            if (!S[j] && dist[j] < minDist)
-            {
-                minDist = dist[j]; // 更新最小距离值
-                u = j;             // 记录当前最小顶点的索引
+void Dijkstra(Graph &G, char start){
+    int v0 = LocateVex(G,start);
+    int n = G.vexNum;
+    
+    vector<int> dist(n + 1, INF);
+    vector<bool> visited(n + 1, false);
+    vector<int> path(n + 1, -1); 
+    dist[v0] = 0;
+    
+    for(int i = 1; i <= n; i++) {
+        int u = -1;
+        int minDist = INF;
+        for(int j = 1; j <= n; j++) {
+            if(!visited[j] && dist[j] < minDist) {
+                u = j;
+                minDist = dist[j];
             }
         }
-
-        // 如果没有找到有效顶点
-        if (u == -1)
-            break;
-
-        S[u] = true; // 将顶点u标记为已处理
-
-        // 遍历所有顶点v，检查通过u到达v是否更优
-        for (int v = 0; v < n; ++v)
-        {
-            // 仅处理未确定最短路径的顶点
-            // 且存在u到v的边
-            // 且新的路径距离比原有记录更短
-            if (!S[v] && G.arcs[u][v] != INT_MAX && dist[u] + G.arcs[u][v] < dist[v])
-            {
-                dist[v] = dist[u] + G.arcs[u][v]; // 更新最短距离
-                path[v] = u;                      // 记录前驱顶点为u
+        
+        if(u == -1) break;  
+        visited[u] = true;
+        
+        for(int v = 1; v <= n; v++) {
+            if(!visited[v] && G.arcs[u][v] != INF) {
+                if(dist[u] + G.arcs[u][v] < dist[v]) {
+                    dist[v] = dist[u] + G.arcs[u][v];
+                    path[v] = u;  // 记录路径
+                }
             }
         }
     }
-
-    // 输出结果
-    for (int i = 0; i < n; ++i)
-    {
-        if (dist[i] == INT_MAX)
-        {
-            cout << G.vexs[i] << " unreachable" << endl;
-            continue;
+    
+    for(int i = 1; i <= n; i++) {
+        if(i != v0) {
+            if(dist[i] == INF) {
+                cout << "Invalid." << endl;
+            } else {
+                cout << dist[i] << endl;
+                cout << start;
+                vector<int> route;
+                int k = i;
+                while(k != -1) {
+                    route.push_back(k);
+                    k = path[k];
+                }
+                for(int r = route.size()-1; r >= 0; r--) {
+                    cout << " -> " << G.vexs[route[r]];
+                }
+                cout << endl;
+            }
         }
-
-        vector<int> pathTrace;
-        int cur = i;
-        while (cur != -1)
-        {
-            pathTrace.push_back(cur);
-            cur = path[cur];
-        }
-        reverse(pathTrace.begin(), pathTrace.end());
-
-        cout << G.vexs[i] << " " << dist[i] << " ";
-        for (size_t j = 0; j < pathTrace.size(); ++j)
-        {
-            if (j > 0)
-                cout << "->";
-            cout << G.vexs[pathTrace[j]];
-        }
-        cout << endl;
     }
 }
 
 int main()
 {
-    AMGraph G;
-    CreateAMGraph(G);
+    Graph G;
+    Create(G);
     char start;
     cin >> start;
-    ShortestPath_DIJ(G, start);
+    Dijkstra(G, start);
     return 0;
 }
 ```
@@ -2141,23 +2076,20 @@ int main()
 **Floyd**
 
 ```c++
-#include <iostream>
-#include <climits>
+#include <bits/stdc++.h>
 using namespace std;
 
-#define MVNum 100 // 假设最大顶点数为100
-
-const int INF = INT_MAX;
+#define MVNum 100
+#define INF 114154
 
 typedef struct
 {
-    char vexs[MVNum];       // 顶点表
-    int arcs[MVNum][MVNum]; // 邻接矩阵
-    int vexNum, arcNum;     // 顶点数和边数
-} AMGraph;
+    char vexs[MVNum];       
+    int arcs[MVNum][MVNum]; 
+    int vexNum, arcNum;     
+} Graph;
 
-// 定位顶点
-int LocateVex(const AMGraph &G, char v)
+int LocateVex(const Graph &G, char v)
 {
     for (int i = 0; i < G.vexNum; ++i)
     {
@@ -2167,70 +2099,95 @@ int LocateVex(const AMGraph &G, char v)
     return -1;
 }
 
-void Floyd(const AMGraph &G, int dist[][MVNum])
+void Create(Graph &G)
 {
-    // 初始化距离矩阵
-    for (int i = 0; i < G.vexNum; ++i)
+    cin >> G.vexNum >> G.arcNum;
+    for (int i = 1; i <= G.vexNum; i++)
     {
-        for (int j = 0; j < G.vexNum; ++j)
+        cin >> G.vexs[i];
+    }
+    for (int i = 1; i <= G.vexNum; i++)
+    {
+        for(int j=1;j<=G.vexNum;j++)
         {
-            dist[i][j] = G.arcs[i][j];
+            G.arcs[i][j]=INF;
+            if(i==j)
+            {
+                G.arcs[i][j]=0;
+            }
         }
     }
-
-    // 三重循环更新最短路径
-    for (int k = 0; k < G.vexNum; ++k)
+    for (int k = 1; k <= G.arcNum; k++)
     {
-        for (int i = 0; i < G.vexNum; ++i)
+        char v1, v2;
+        int w;
+        cin >> v1 >> v2 >> w;
+        int i = LocateVex(G, v1);
+        int j = LocateVex(G, v2);
+        if (i != -1 && j != -1)
         {
-            for (int j = 0; j < G.vexNum; ++j)
-            {
-                if (dist[i][k] != INF && dist[k][j] != INF && dist[i][j] > dist[i][k] + dist[k][j])
-                {
+            G.arcs[i][j] = w;
+        }
+    }
+}
+
+void Floyd(Graph &G)
+{
+    int n = G.vexNum;
+    vector<vector<int>> dist(n + 1, vector<int>(n + 1));
+    vector<vector<int>> path(n + 1, vector<int>(n + 1, -1));
+    
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= n; j++) {
+            dist[i][j] = G.arcs[i][j];
+            if(dist[i][j] < INF && i != j) {
+                path[i][j] = i;  
+            }
+        }
+    }
+    
+    for(int k = 1; k <= n; k++) {  
+        for(int i = 1; i <= n; i++) {  
+            for(int j = 1; j <= n; j++) {  
+                if(dist[i][k] != INF && dist[k][j] != INF && 
+                   dist[i][k] + dist[k][j] < dist[i][j]) {
                     dist[i][j] = dist[i][k] + dist[k][j];
+                    path[i][j] = path[k][j];  
+                }
+            }
+        }
+    }
+    
+    for(int i = 1; i <= n; i++) {
+        for(int j = 1; j <= n; j++) {
+            if(i != j) {
+                cout << G.vexs[i] << " " << G.vexs[j];
+                if(dist[i][j] == INF) {
+                    cout << "Invalid." << endl;
+                } else {
+                    cout << dist[i][j] << endl;
+                    cout << G.vexs[i];
+                    int k = path[i][j];
+                    vector<int> route;
+                    while(k != -1) {
+                        route.push_back(k);
+                        k = path[i][k];
+                    }
+                    for(int r = route.size()-1; r >= 0; r--) {
+                        cout << " -> " << G.vexs[route[r]];
+                    }
+                    cout << " -> " << G.vexs[j] << endl;
                 }
             }
         }
     }
 }
 
-void CreateAMGraph(AMGraph &G)
-{
-    cin >> G.vexNum >> G.arcNum;
-
-    for (int i = 0; i < G.vexNum; ++i)
-        cin >> G.vexs[i];
-
-    for (int i = 0; i < G.vexNum; ++i)
-        for (int j = 0; j < G.vexNum; ++j)
-            G.arcs[i][j] = (i == j) ? 0 : INF;
-
-    for (int k = 0; k < G.arcNum; ++k)
-    {
-        char v1, v2;
-        int weight;
-        cin >> v1 >> v2 >> weight;
-        int i = LocateVex(G, v1);
-        int j = LocateVex(G, v2);
-        G.arcs[i][j] = weight;
-    }
-}
-
 int main()
 {
-    AMGraph G;
-    CreateAMGraph(G);
-
-    int dist[MVNum][MVNum];
-    Floyd(G, dist);
-
-    for (int j = 0; j < G.vexNum; ++j)
-    {
-        if (dist[0][j] != INF)
-            cout << "Distance from " << G.vexs[0] << " to " << G.vexs[j] << ": " << dist[0][j] << endl;
-        else
-            cout << "No path from " << G.vexs[0] << " to " << G.vexs[j] << endl;
-    }
+    Graph G;
+    Create(G);
+    Floyd(G);
     return 0;
 }
 ```
@@ -2238,343 +2195,247 @@ int main()
 **拓扑排序**
 
 ```c++
-#include <iostream>
-#include <stack>
+#include <bits/stdc++.h>
 using namespace std;
 
-#define MAX_VERTEX_NUM 100
+#define MVNum 100
 
-// 边表结点
-typedef struct ArcNode
-{
-    int adjvex;              // 该弧所指向的顶点的位置
-    struct ArcNode *nextarc; // 指向下一条弧的指针
-} ArcNode;
+typedef struct {
+    char vexs[MVNum];        
+    int arcs[MVNum][MVNum];  
+    int vexNum, arcNum;      
+} Graph;
 
-// 顶点表结点
-typedef struct VNode
-{
-    int in;            // 顶点入度
-    ArcNode *firstarc; // 指向第一条依附该顶点的弧的指针
-} VNode, AdjList[MAX_VERTEX_NUM];
+int LocateVex(const Graph &G, char v) {
+    for (int i = 0; i < G.vexNum; ++i) {
+        if (G.vexs[i] == v)
+            return i;
+    }
+    return -1;
+}
 
-// 图结构
-typedef struct
-{
-    AdjList vertices;   // 邻接表
-    int vexnum, arcnum; // 顶点数和弧数
-} ALGraph;
-
-void TopologicalSort(ALGraph G, int topo[])
-{
-    int indegree[MAX_VERTEX_NUM]; // 入度数组
-    stack<int> s;
-
-    // 初始化入度数组
-    for (int i = 0; i < G.vexnum; ++i)
-    {
-        indegree[i] = G.vertices[i].in;
-        if (indegree[i] == 0)
-        {
-            s.push(i); // 入度为0的顶点入栈
+void CreateGraph(Graph &G) {
+    cin >> G.vexNum >> G.arcNum;
+    
+    for (int i = 0; i < G.vexNum; i++) {
+        cin >> G.vexs[i];
+    }
+    
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            G.arcs[i][j] = 0;
         }
     }
+    
+    for (int k = 0; k < G.arcNum; k++) {
+        char v1, v2;
+        cin >> v1 >> v2;
+        int i = LocateVex(G, v1);
+        int j = LocateVex(G, v2);
+        if (i != -1 && j != -1) {
+            G.arcs[i][j] = 1;  // 有向图
+        }
+    }
+}
 
-    int count = 0;
-    while (!s.empty())
-    {                    // 判断栈是否为空
-        int u = s.top(); // 获取栈顶元素
-        s.pop();         // 弹出栈顶
-        topo[count] = u; // 存储拓扑序列
-        count++;
-
-        // 遍历u的所有邻接点
-        for (ArcNode *p = G.vertices[u].firstarc; p != nullptr; p = p->nextarc)
-        {
-            int v = p->adjvex;
-            if (--indegree[v] == 0) // 减少入度
-            {
-                s.push(v); // 入栈
+bool TopologicalSort(Graph &G) {
+    vector<int> inDegree(G.vexNum, 0);
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            if (G.arcs[j][i] == 1) {
+                inDegree[i]++;
             }
         }
     }
-
-    // 存在环则无法完成拓扑排序
-    if (count != G.vexnum)
-    {
-        return;
+    
+    queue<int> q;
+    for (int i = 0; i < G.vexNum; i++) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+    
+    int count = 0;  
+    vector<char> result;  
+    
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+        result.push_back(G.vexs[v]);
+        count++;
+        
+        for (int i = 0; i < G.vexNum; i++) {
+            if (G.arcs[v][i] == 1) {
+                inDegree[i]--;
+                if (inDegree[i] == 0) {
+                    q.push(i);
+                }
+            }
+        }
+    }
+    
+    if (count == G.vexNum) {
+        for (char c : result) {
+            cout << c << " ";
+        }
+        cout << endl;
+        return true;
+    } else {
+        return false;
     }
 }
 
-int main()
-{
-    ALGraph G;
-    G.vexnum = 4;
-    G.arcnum = 4;
-
-    // 邻接表初始化
-    for (int i = 0; i < G.vexnum; ++i)
-    {
-        G.vertices[i].in = 0;
-        G.vertices[i].firstarc = nullptr;
-    }
-
-    ArcNode *arc;
-
-    // 添加边 0->1
-    arc = new ArcNode{1, nullptr};
-    arc->nextarc = G.vertices[0].firstarc;
-    G.vertices[0].firstarc = arc;
-    G.vertices[1].in++;
-
-    // 添加边 0->2
-    arc = new ArcNode{2, nullptr};
-    arc->nextarc = G.vertices[0].firstarc;
-    G.vertices[0].firstarc = arc;
-    G.vertices[2].in++;
-
-    // 添加边 1->3
-    arc = new ArcNode{3, nullptr};
-    arc->nextarc = G.vertices[1].firstarc;
-    G.vertices[1].firstarc = arc;
-    G.vertices[3].in++;
-
-    // 添加边 2->3
-    arc = new ArcNode{3, nullptr};
-    arc->nextarc = G.vertices[2].firstarc;
-    G.vertices[2].firstarc = arc;
-    G.vertices[3].in++;
-
-    int topo[MAX_VERTEX_NUM];
-    TopologicalSort(G, topo);
-
-    for (int i = 0; i < G.vexnum; ++i)
-    {
-        cout << topo[i] << " ";
-    }
-    cout << endl;
-
+int main() {
+    Graph G;
+    CreateGraph(G);
+    TopologicalSort(G);
     return 0;
-}
+} 
 ```
 
 **关键路径**
 
 ```c++
-#include <stdio.h>
-#include <stdlib.h>
+#include <bits/stdc++.h>
+using namespace std;
 
-#define MVNum 100 // 最大顶点数
-#define OK 1
-#define ERROR 0
+#define MVNum 100
+#define INF 114154
 
-typedef char VerTexType; // 顶点类型
-typedef int ArcType;     // 边的权值类型
+typedef struct {
+    char vexs[MVNum];        
+    int arcs[MVNum][MVNum];  
+    int vexNum, arcNum;      
+} Graph;
 
-typedef struct
-{
-    VerTexType vexs[MVNum];     // 顶点表
-    ArcType arcs[MVNum][MVNum]; // 邻接矩阵
-    int vexnum, arcnum;         // 图的当前顶点数和边数
-} AMGraph;
-
-int LocateVex(AMGraph *G, VerTexType v)
-{
-    for (int i = 0; i < G->vexnum; i++)
-    {
-        if (G->vexs[i] == v)
-        {
+int LocateVex(const Graph &G, char v) {
+    for (int i = 0; i < G.vexNum; ++i) {
+        if (G.vexs[i] == v)
             return i;
-        }
     }
     return -1;
 }
 
-int CreateAOEGraph(AMGraph *G)
-{
-    scanf("%d", &G->vexnum);
-    scanf("%d", &G->arcnum);
-
-    for (int i = 0; i < G->vexnum; i++)
-    {
-        scanf(" %c", &G->vexs[i]);
+void CreateGraph(Graph &G) {
+    cin >> G.vexNum >> G.arcNum;
+    
+    for (int i = 0; i < G.vexNum; i++) {
+        cin >> G.vexs[i];
     }
-
-    // 初始化邻接矩阵
-    for (int i = 0; i < G->vexnum; i++)
-    {
-        for (int j = 0; j < G->vexnum; j++)
-        {
-            G->arcs[i][j] = 0;
+    
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            G.arcs[i][j] = 0;
         }
     }
-
-    for (int k = 0; k < G->arcnum; k++)
-    {
+    
+    for (int k = 0; k < G.arcNum; k++) {
         char v1, v2;
-        int weight;
-        scanf(" %c %c %d", &v1, &v2, &weight);
+        int w;
+        cin >> v1 >> v2 >> w;
         int i = LocateVex(G, v1);
         int j = LocateVex(G, v2);
-        if (i == -1 || j == -1)
-        {
-            return ERROR;
+        if (i != -1 && j != -1) {
+            G.arcs[i][j] = w;
         }
-        G->arcs[i][j] = weight;
     }
-    return OK;
 }
 
-int TopologicalOrder(AMGraph G, int *topoOrder)
-{
-    int inDegree[MVNum] = {0};
-
-    // 计算入度
-    for (int j = 0; j < G.vexnum; j++)
-    {
-        for (int i = 0; i < G.vexnum; i++)
-        {
-            if (G.arcs[i][j] != 0)
-            {
-                inDegree[j]++;
+bool TopologicalSort(Graph &G, vector<int> &topoOrder) {
+    vector<int> inDegree(G.vexNum, 0);
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            if (G.arcs[j][i] != 0) {
+                inDegree[i]++;
             }
         }
     }
-
-    int queue[MVNum];
-    int front = 0, rear = 0;
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        if (inDegree[i] == 0)
-        {
-            queue[rear++] = i;
+    
+    queue<int> q;
+    for (int i = 0; i < G.vexNum; i++) {
+        if (inDegree[i] == 0) {
+            q.push(i);
         }
     }
-
-    int count = 0;
-    while (front != rear)
-    {
-        int u = queue[front++];
-        topoOrder[count++] = u;
-
-        for (int v = 0; v < G.vexnum; v++)
-        {
-            if (G.arcs[u][v] != 0)
-            {
-                if (--inDegree[v] == 0)
-                {
-                    queue[rear++] = v;
+    
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+        topoOrder.push_back(v);
+        
+        for (int i = 0; i < G.vexNum; i++) {
+            if (G.arcs[v][i] != 0) {
+                inDegree[i]--;
+                if (inDegree[i] == 0) {
+                    q.push(i);
                 }
             }
         }
     }
-
-    if (count != G.vexnum)
-    {
-        return ERROR; // 存在环
-    }
-    return OK;
+    
+    return topoOrder.size() == G.vexNum;
 }
 
-void CalculateVE(AMGraph G, int *topoOrder, int *ve)
-{
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        ve[i] = 0;
-    }
-
-    for (int i = 0; i < G.vexnum; i++)
-    {
+void CalculateVE(Graph &G, const vector<int> &topoOrder, vector<int> &ve) {
+    // 初始化ve数组
+    ve.resize(G.vexNum, 0);
+    
+    // 按拓扑顺序计算ve
+    for (int i = 0; i < topoOrder.size(); i++) {
         int u = topoOrder[i];
-        for (int v = 0; v < G.vexnum; v++)
-        {
-            if (G.arcs[u][v] != 0 && ve[v] < ve[u] + G.arcs[u][v])
-            {
-                ve[v] = ve[u] + G.arcs[u][v];
+        for (int v = 0; v < G.vexNum; v++) {
+            if (G.arcs[u][v] != 0) {
+                ve[v] = max(ve[v], ve[u] + G.arcs[u][v]);
             }
         }
     }
 }
 
-void CalculateVL(AMGraph G, int *topoOrder, int *ve, int *vl)
-{
-    int maxVE = 0;
-    // 找到所有汇点的最大ve值
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        int isSink = 1;
-        for (int j = 0; j < G.vexnum; j++)
-        {
-            if (G.arcs[i][j] != 0)
-            {
-                isSink = 0;
-                break;
-            }
-        }
-        if (isSink && ve[i] > maxVE)
-        {
-            maxVE = ve[i];
-        }
-    }
-
-    // 初始化vl
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        vl[i] = maxVE;
-    }
-
-    // 逆拓扑处理
-    for (int i = G.vexnum - 1; i >= 0; i--)
-    {
+void CalculateVL(Graph &G, const vector<int> &topoOrder, const vector<int> &ve, vector<int> &vl) {
+    // 初始化vl数组
+    vl.resize(G.vexNum, ve[topoOrder.back()]);
+    
+    // 按逆拓扑顺序计算vl
+    for (int i = topoOrder.size() - 1; i >= 0; i--) {
         int u = topoOrder[i];
-        for (int v = 0; v < G.vexnum; v++)
-        {
-            if (G.arcs[u][v] != 0)
-            {
-                if (vl[u] > vl[v] - G.arcs[u][v])
-                {
-                    vl[u] = vl[v] - G.arcs[u][v];
+        for (int v = 0; v < G.vexNum; v++) {
+            if (G.arcs[u][v] != 0) {
+                vl[u] = min(vl[u], vl[v] - G.arcs[u][v]);
+            }
+        }
+    }
+}
+
+void FindCriticalPath(Graph &G, const vector<int> &ve, const vector<int> &vl) {
+    for (int i = 0; i < G.vexNum; i++) {
+        for (int j = 0; j < G.vexNum; j++) {
+            if (G.arcs[i][j] != 0) {
+                int e = ve[i];  // 活动最早开始时间
+                int l = vl[j] - G.arcs[i][j];  // 活动最晚开始时间
+                if (e == l) {  // 关键活动
+                    cout << G.vexs[i] << " " << G.vexs[j] << " " << G.arcs[i][j] << endl;
                 }
             }
         }
     }
 }
 
-void FindCriticalPath(AMGraph G, int *ve, int *vl)
-{
-    for (int i = 0; i < G.vexnum; i++)
-    {
-        for (int j = 0; j < G.vexnum; j++)
-        {
-            if (G.arcs[i][j] != 0)
-            {
-                int e = ve[i];
-                int l = vl[j] - G.arcs[i][j];
-                if (e == l)
-                {
-                    printf("%c -> %c, 权值: %d\n", G.vexs[i], G.vexs[j], G.arcs[i][j]);
-                }
-            }
-        }
+int main() {
+    Graph G;
+    CreateGraph(G);
+    
+    vector<int> topoOrder;
+    if (!TopologicalSort(G, topoOrder)) {
+        cout << "ERROR" << endl;
+        return 0;
     }
-}
-
-int main()
-{
-    AMGraph G;
-    int topoOrder[MVNum];
-
-    if (TopologicalOrder(G, topoOrder) == ERROR)
-    {
-        return 1;
-    }
-
-    int ve[MVNum], vl[MVNum];
+    
+    vector<int> ve, vl;
     CalculateVE(G, topoOrder, ve);
     CalculateVL(G, topoOrder, ve, vl);
-
+    
     FindCriticalPath(G, ve, vl);
-
+    
     return 0;
 }
 ```
@@ -2796,23 +2657,19 @@ using namespace std;
 // 拉链法
 static const int tableSize = 10;
 
-// 哈希表数组，包含链表来处理冲突
 vector<list<pair<int, string>>> chainTable(tableSize);
 
-// 哈希函数
 int hashFunction(int key)
 {
     return key % tableSize;
 }
 
-// 插入操作（拉链法）
 void insertChaining(int key, string value)
 {
     int index = hashFunction(key);
     chainTable[index].push_back(make_pair(key, value));
 }
 
-// 查找操作（拉链法）
 string searchChaining(int key)
 {
     int index = hashFunction(key);
@@ -2824,7 +2681,6 @@ string searchChaining(int key)
     return "";
 }
 
-// 删除操作（拉链法）
 void removeChaining(int key)
 {
     int index = hashFunction(key);
@@ -2848,16 +2704,13 @@ struct HashEntry {
     EntryState state;
 };
 
-// 哈希表数组
 vector<HashEntry> openTable(tableSize, {0, "", EMPTY});
 
-// 哈希函数（同前）
 int hashFunctionLP(int key)
 {
     return key % tableSize;
 }
 
-// 插入操作（线性探测）
 void insertLinear(int key, string value)
 {
     int idx = hashFunctionLP(key);
@@ -2874,7 +2727,6 @@ void insertLinear(int key, string value)
     }
 }
 
-// 查找操作
 string searchLinear(int key)
 {
     int idx = hashFunctionLP(key);
@@ -2889,7 +2741,6 @@ string searchLinear(int key)
     return "";
 }
 
-// 删除操作
 void removeLinear(int key)
 {
     int idx = hashFunctionLP(key);
@@ -2924,6 +2775,7 @@ void removeLinear(int key)
 #include <unordered_set>
 using namespace std;
 
+int main(){
     unordered_set<int> us;
     us.insert(3);
     us.insert(1);
@@ -2935,6 +2787,7 @@ using namespace std;
     us.erase(3);
     us.clear();
     cout << us.empty() << endl; 
+}
 ```
 
 **unordered_map**
@@ -2953,6 +2806,7 @@ using namespace std;
 #include <unordered_map>
 using namespace std;
 
+int main(){
     unordered_map<string, int> um;
     um.insert({"apple", 3});
     um.insert(make_pair("banana", 5));
@@ -2966,6 +2820,7 @@ using namespace std;
     um.erase("apple");
     um.clear();
     cout << um.empty() << endl; 
+}
 ```
 
 ### 排序
@@ -2986,18 +2841,18 @@ void InsertSort(SqList &L)
 {
     for (int i = 1; i < L.length; i++)
     {
-        int temp = L.r[i]; // 暂存待排序元素
-        int j = i - 1;     // 指向已排序部分的最后一个元素
-        // 从后向前查找插入位置，并后移元素
+        int temp = L.r[i]; 
+        int j = i - 1;     
         while (j >= 0 && L.r[j] > temp)
         {
             L.r[j + 1] = L.r[j];
             j--;
         }
-        L.r[j + 1] = temp; // 插入到正确位置
+        L.r[j + 1] = temp;
     }
 }
 
+// 二分查找插入位置
 void BinaryInsertSort(SqList &L)
 {
     for (int i = 1; i < L.length; i++)
@@ -3005,7 +2860,6 @@ void BinaryInsertSort(SqList &L)
         int temp = L.r[i];
         int start = 0;
         int end = i - 1;
-        // 二分查找mid
         while (start <= end)
         {
             int mid = (start + end) / 2;
@@ -3019,13 +2873,11 @@ void BinaryInsertSort(SqList &L)
             }
         }
 
-        // 将插入位置后的元素后移
         for (int j = i - 1; j >= start; j--)
         {
             L.r[j + 1] = L.r[j];
         }
-
-        // 插入元素到正确位置
+        
         L.r[start] = temp;
     }
 }
@@ -3053,14 +2905,13 @@ void ShellSort(Sqlist &L)
         // 对每个子序列进行插入排序
         for (int i = gap; i < L.length; i++)
         {
-            int temp = L.data[i]; // 当前待插入元素
+            int temp = L.data[i]; 
             int j;
-            // 插入排序逻辑：将元素插入到对应子序列的正确位置
             for (j = i; j >= gap && L.data[j - gap] > temp; j -= gap)
             {
-                L.data[j] = L.data[j - gap]; // 将前一个元素后移
+                L.data[j] = L.data[j - gap]; 
             }
-            L.data[j] = temp; // 插入到正确位置
+            L.data[j] = temp; 
         }
     }
 }
@@ -3175,15 +3026,16 @@ typedef struct
     int length;
 } Sqlist;
 
-void HeapAdjust(Sqlist &L, int s, int m) // s: 待调整的子树根节点下标  m：最后一个元素的下标（调整范围上限）
+void HeapAdjust(Sqlist &L, int s, int m) 
+// s: 待调整的子树根节点下标  m：最后一个元素的下标（调整范围上限）
 {
     int rc = L.data[s];
     // 沿关键字较大的子节点向下筛选
-    for (int j = 2 * s + 1; j <= m; j = 2 * j + 1) // 完全二叉树 左孩子2k+1
+    for (int j = 2 * s + 1; j <= m; j = 2 * j + 1) // 完全二叉树 左孩子下标2k+1
     {
         // 比较左右孩子，j指向较大的孩子
         if (j < m && L.data[j] < L.data[j + 1])
-            j++; // 右孩子更大，j指向右孩子
+            j = j + 1; // 右孩子更大，j指向右孩子
 
         // 若根节点已比最大孩子大，则调整完成
         if (rc >= L.data[j])
@@ -3206,9 +3058,8 @@ void CreateHeap(Sqlist &L)
 
 void HeapSort(Sqlist &L)
 {
-    CreateHeap(L); // 初始建堆
-
-    // 依次将堆顶元素（最大值）与末尾元素交换并调整堆
+    CreateHeap(L);
+    
     for (int i = L.length - 1; i > 0; i--)
     {
         swap(L.data[0], L.data[i]); // 堆顶最大值交换到末尾
@@ -3284,7 +3135,6 @@ void MergeSort(Sqlist &L)
 
 ```c++
 #include <iostream>
-
 using namespace std;
 
 #define MAXSIZE 100
@@ -3295,12 +3145,12 @@ typedef struct
     int length;
 } Sqlist;
 
+// 以位数比较为例
 void RadixSort(Sqlist &L)
 {
     if (L->length <= 1)
         return;
 
-    // 获取最大值以确定最高位数
     int max_num = L->data[0];
     for (int i = 1; i < L->length; ++i)
     {
@@ -3308,26 +3158,22 @@ void RadixSort(Sqlist &L)
             max_num = L->data[i];
     }
 
-    // 从低位到高位依次进行排序
     for (int exp = 1; max_num / exp > 0; exp *= 10)
     {
-        int count[10] = {0}; // 统计每个桶的元素个数
-        int output[MAXSIZE]; // 临时存放排序结果
+        int count[10] = {0};
+        int output[MAXSIZE]; 
 
-        // 统计当前位的出现次数
         for (int i = 0; i < L->length; ++i)
         {
             int digit = (L->data[i] / exp) % 10;
             count[digit]++;
         }
 
-        // 计算前缀和，确定各桶的右边界
         for (int j = 1; j < 10; ++j)
         {
             count[j] += count[j - 1];
         }
 
-        // 逆序遍历，保证稳定性
         for (int i = L->length - 1; i >= 0; --i)
         {
             int digit = (L->data[i] / exp) % 10;
@@ -3335,7 +3181,6 @@ void RadixSort(Sqlist &L)
             count[digit]--;
         }
 
-        // 将排序结果复制回原数组
         for (int i = 0; i < L->length; ++i)
         {
             L->data[i] = output[i];
